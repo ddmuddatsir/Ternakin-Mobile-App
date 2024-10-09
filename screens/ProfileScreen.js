@@ -51,17 +51,7 @@ const ProfileScreen = () => {
           backgroundColor: GlobalStyles.colors.light,
         }}
       >
-        <View
-          style={{
-            paddingVertical: 14,
-            paddingHorizontal: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <HeaderBar text="My Profile" active={true} />
-        </View>
+        <HeaderBar text="My Profile" active={true} />
       </SafeAreaView>
       <ScrollView
         style={{

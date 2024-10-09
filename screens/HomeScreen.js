@@ -53,16 +53,7 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#D29852" }}>
-      <View
-        style={{
-          padding: 10,
-          flexDirection: "row",
-          alignItems: "center",
-        }}
-      >
-        <HeaderBar searcBar active={false} text={"Red Cow"} />
-      </View>
-
+      <HeaderBar searcBar active={false} text={"Red Cow"} />
       <ScrollView style={{ backgroundColor: "white", flex: 1 }}>
         <PaymentBar style={{ flex: 1 }} />
         <FiturButtonService />
@@ -80,6 +71,7 @@ const HomeScreen = () => {
           <FiturButtonAnimal />
         </View>
         <PromoBannerList />
+
         <View style={{ paddingHorizontal: 10, paddingVertical: 12 }}>
           <View
             style={{

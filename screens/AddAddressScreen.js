@@ -28,17 +28,7 @@ const AddAddressScreen = () => {
           backgroundColor: GlobalStyles.colors.light,
         }}
       >
-        <View
-          style={{
-            paddingVertical: 10,
-            paddingHorizontal: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <HeaderBar back text={"Add New Address"} />
-        </View>
+        <HeaderBar back text={"Add New Address"} />
       </SafeAreaView>
       <ScrollView style={{ backgroundColor: GlobalStyles.colors.light }}>
         <View style={{ height: 50, backgroundColor: "#00CED1" }} />

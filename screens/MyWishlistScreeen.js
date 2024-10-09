@@ -12,17 +12,7 @@ const MyWishlistScreeen = () => {
         backgroundColor: GlobalStyles.colors.light,
       }}
     >
-      <View
-        style={{
-          paddingVertical: 10,
-          paddingHorizontal: 10,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <HeaderBar back searcBar active={true} text={"Look for Transaction"} />
-      </View>
+      <HeaderBar back searcBar active={true} text={"Look for Transaction"} />
     </SafeAreaView>
   );
 };

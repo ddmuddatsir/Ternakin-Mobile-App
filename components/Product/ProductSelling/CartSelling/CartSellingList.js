@@ -5,42 +5,37 @@ import CartItemSellingItem from "./CartItemSelling";
 import { useState } from "react";
 
 const CartSellingList = ({ product, onIncrement, onDecrement }) => {
-  const [checkFarmProduct, setCheckFarmProduct] = useState(false);
-  const [checkProduct, setCheckProduct] = useState({});
+  const [checkedFarms, setCheckedFarms] = useState(new Set());
+  const [checkedProducts, setCheckedProducts] = useState({});
 
-  const handleCheckProduct = (product) => {
-    setCheckProduct((prevState) => ({
-      ...prevState,
-      [product]: !prevState[product],
-    }));
+  const toggleFarmCheck = (farmId) => {
+    const updatedSet = new Set(checkedFarms);
+    if (updatedSet.has(farmId)) {
+      updatedSet.delete(farmId);
+    } else {
+      updatedSet.add(farmId);
+    }
+    setCheckedFarms(updatedSet);
   };
 
-  const handleCheckFarmProduct = (product) => {
-    setCheckFarmProduct((prevState) => !prevState);
-
-    setCheckProduct((prevState) => ({
+  const toggleProductCheck = (productId) => {
+    setCheckedProducts((prevState) => ({
       ...prevState,
-      [product]: !prevState[product],
+      [productId]: !prevState[productId],
     }));
   };
-
-  const farmName = product.farmId.name;
-  const showFarmName = !renderedFarms.has(farmName);
-
-  // Add farm name to the Set if not already present
-  if (showFarmName) {
-    renderedFarms.add(farmName);
-  }
 
   return (
     <View style={{ gap: 8 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <Pressable onPress={handleCheckFarmProduct}>
+        <Pressable onPress={() => toggleFarmCheck(product.farmId._id)}>
           <MaterialCommunityIcons
-            name={`checkbox-blank${checkFarmProduct ? "" : "-outline"}`}
+            name={`checkbox-blank${
+              checkedFarms.has(product.farmId._id) ? "" : "-outline"
+            }`}
             size={26}
             color={
-              checkFarmProduct
+              checkedFarms.has(product.farmId._id)
                 ? GlobalStyles.colors.primary
                 : GlobalStyles.colors.gray100
             }
@@ -53,16 +48,16 @@ const CartSellingList = ({ product, onIncrement, onDecrement }) => {
             fontWeight: 600,
           }}
         >
-          {farmName}
+          {product.farmId.name}
         </Text>
       </View>
       <CartItemSellingItem
-        key={product.id}
+        key={product._id}
         product={product}
-        onIncrement={onIncrement}
-        onDecrement={onDecrement}
-        onCheckProduct={handleCheckProduct}
-        checked={checkProduct[product]}
+        onIncrement={() => onIncrement(product)}
+        onDecrement={() => onDecrement(product, product.quantity)}
+        onCheckProduct={toggleProductCheck}
+        checked={checkedProducts[product._id]}
       />
     </View>
   );

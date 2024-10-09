@@ -10,6 +10,7 @@ import {
   decrementQuantity,
   incrementQuantity,
   cleanCart,
+  removeFromCart,
 } from "../redux/CartReducer";
 import BottomTabButton from "../components/Button/BottomTabButton";
 import Button from "../components/Button/Button";
@@ -27,14 +28,14 @@ const CartScreen = () => {
   const dispatch = useDispatch();
 
   const handleIncrementQuantity = (product) => {
-    dispatch(incrementQuantity({ id: product.id }));
+    dispatch(incrementQuantity({ _id: product._id }));
   };
 
   const handleDecrementQuantity = (product, quantity) => {
     if (quantity === 1) {
-      dispatch(removeFromCart({ id: product.id }));
+      dispatch(removeFromCart({ _id: product._id }));
     } else {
-      dispatch(decrementQuantity({ id: product.id }));
+      dispatch(decrementQuantity({ _id: product._id }));
     }
   };
 
@@ -46,7 +47,14 @@ const CartScreen = () => {
     }
   };
 
-  console.log(cart);
+  const getTotalQuantity = () => {
+    return cart.reduce(
+      (totalQuantity, product) => totalQuantity + product.quantity,
+      0
+    );
+  };
+
+  // console.log(cart);
 
   return (
     <>
@@ -57,17 +65,7 @@ const CartScreen = () => {
           backgroundColor: GlobalStyles.colors.light,
         }}
       >
-        <View
-          style={{
-            paddingVertical: 10,
-            paddingHorizontal: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <HeaderBar withouttIcon wishlist back active={true} text={"Cart"} />
-        </View>
+        <HeaderBar withouttIcon wishlist back active={true} text={"Cart"} />
       </SafeAreaView>
       <ScrollView style={{ backgroundColor: GlobalStyles.colors.light }}>
         <View style={{ padding: 10, gap: 16 }}>
@@ -221,7 +219,7 @@ const CartScreen = () => {
 
         <Button
           onPress={handlerConfirm}
-          text={`Checkout (${cart.length})`}
+          text={`Checkout (${getTotalQuantity()})`}
           color="secondary"
           styles={{
             flex: 1.6,

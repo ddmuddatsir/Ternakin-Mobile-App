@@ -21,17 +21,8 @@ const TransactionScreen = () => {
           backgroundColor: GlobalStyles.colors.light,
         }}
       >
-        <View
-          style={{
-            paddingVertical: 10,
-            paddingHorizontal: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <HeaderBar searcBar active={true} text={"Look for Transaction"} />
-        </View>
+        <HeaderBar searcBar active={true} text={"Look for Transaction"} />
+
         <View
           style={{
             justifyContent: "center",

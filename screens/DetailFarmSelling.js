@@ -45,22 +45,7 @@ const DetailFarmSelling = ({ route, item }) => {
           backgroundColor: GlobalStyles.colors.light,
         }}
       >
-        <View
-          style={{
-            paddingVertical: 10,
-            paddingHorizontal: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <HeaderBar
-            searcBar
-            back
-            active={true}
-            text={"Look for Transaction"}
-          />
-        </View>
+        <HeaderBar searcBar back active={true} text={"Look for Transaction"} />
       </SafeAreaView>
       <View style={styles.header}>
         <Text style={styles.farmName}>{farmId}</Text>

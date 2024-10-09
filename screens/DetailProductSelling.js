@@ -7,7 +7,7 @@ import {
   Image,
   Pressable,
 } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import HeaderBar from "../components/HeaderBar/HeaderBar";
 import { GlobalStyles } from "../constants/style";
 import Octicons from "@expo/vector-icons/Octicons";
@@ -16,15 +16,20 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import TitleForList from "../components/Title/TitleForList";
 import ProductCardSellingList from "../components/Product/ProductSelling/ProductCardSellingList";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "../redux/CartReducer";
+import { addOrder, addToCart } from "../redux/CartReducer";
 import ShippingCardModal from "../components/Modal/ShippingCardModal";
 import DetailProductSellingDescription from "../components/Description/DetailProductSellingDescription";
 import BottomTabButton from "../components/Button/BottomTabButton";
 import Button from "../components/Button/Button";
 import axios from "axios";
 import { BASE_URL } from "../api/models/apiConfig";
+import AddedValueCard from "../components/UI/AddedValueCard";
+import FarmCard from "../components/UI/FarmCard";
+import ConversationCard from "../components/UI/ConversationCard";
+import ProductShare from "../components/UI/ProductShare";
 
 const DetailProductSelling = ({ route }) => {
+  const navigation = useNavigation();
   const { productId } = route.params;
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
@@ -78,23 +83,9 @@ const DetailProductSelling = ({ route }) => {
           backgroundColor: GlobalStyles.colors.light,
         }}
       >
-        <View
-          style={{
-            paddingVertical: 10,
-            paddingHorizontal: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <HeaderBar
-            searcBar
-            back
-            active={true}
-            text={"Look for Transaction"}
-          />
-        </View>
+        <HeaderBar searcBar back active={true} text={"Look for Transaction"} />
       </SafeAreaView>
+
       <ScrollView style={{ backgroundColor: GlobalStyles.colors.background }}>
         <View
           style={{
@@ -240,93 +231,12 @@ const DetailProductSelling = ({ route }) => {
                   showsHorizontalScrollIndicator={false}
                   style={{ flexDirection: "row", paddingVertical: 4 }}
                 >
-                  <View
-                    style={{
-                      justifyContent: "center",
-                      gap: 4,
-                      alignItems: "center",
-                      flexDirection: "row",
-                      padding: 6,
-                      backgroundColor: GlobalStyles.colors.success50,
-                      borderRadius: 12,
-                      borderWidth: 1.5,
-                      borderColor: GlobalStyles.colors.success500,
-                      marginRight: 6,
-                    }}
-                  >
-                    <Ionicons
-                      name="shield-checkmark-outline"
-                      size={16}
-                      color={GlobalStyles.colors.success500}
-                    />
-                    <Text
-                      style={{
-                        fontWeight: 600,
-                        fontSize: 12,
-                        color: GlobalStyles.colors.gray500,
-                      }}
-                    >
-                      Product damage protection
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      justifyContent: "center",
-                      gap: 4,
-                      alignItems: "center",
-                      flexDirection: "row",
-                      padding: 6,
-                      backgroundColor: "#f5f1ee",
-                      borderRadius: 12,
-                      borderWidth: 1.5,
-                      borderColor: GlobalStyles.colors.primary100,
-                      marginRight: 6,
-                    }}
-                  >
-                    <MaterialCommunityIcons
-                      name="check-decagram-outline"
-                      size={16}
-                      color={GlobalStyles.colors.primary100}
-                    />
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: GlobalStyles.colors.gray500,
-                      }}
-                    >
-                      Verified farm
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      justifyContent: "center",
-                      gap: 4,
-                      alignItems: "center",
-                      flexDirection: "row",
-                      padding: 6,
-                      backgroundColor: "#e0ffff",
-                      borderRadius: 12,
-                      borderWidth: 1.5,
-                      borderColor: GlobalStyles.colors.blue300,
-                      marginRight: 6,
-                    }}
-                  >
-                    <MaterialCommunityIcons
-                      name="truck-check-outline"
-                      size={16}
-                      color={GlobalStyles.colors.blue300}
-                    />
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: GlobalStyles.colors.gray500,
-                      }}
-                    >
-                      Safe delivery
-                    </Text>
-                  </View>
+                  <AddedValueCard
+                    title="Product damage protection"
+                    iconDefend
+                  />
+                  <AddedValueCard title="Verified farm" iconVerified />
+                  <AddedValueCard title="Safe delivery" iconDelivery />
                 </ScrollView>
               </View>
             </View>
@@ -342,107 +252,15 @@ const DetailProductSelling = ({ route }) => {
             shippingLocation={product.shippingMethodId.location}
             shippingMethodId={product.shippingMethodId.method}
           />
+          <FarmCard
+            img={{ uri: product.farmId.image }}
+            name={product.farmId.name}
+            location={product.farmId.name}
+            rating={product.farmId.rating}
+            workingHours={product.farmId.workingHours}
+            followers={product.farmId.followers}
+          />
 
-          <View
-            style={{
-              backgroundColor: GlobalStyles.colors.light,
-              flex: 1,
-              gap: 8,
-              marginBottom: 8,
-              padding: 14,
-              justifyContent: "space-between",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Pressable style={{ marginVertical: 12, gap: 6 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  gap: 8,
-                }}
-              >
-                <Image
-                  source={{ uri: product.farmId.image }}
-                  style={{
-                    height: 40,
-                    width: 40,
-                    borderRadius: 32,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                />
-                <View style={{}}>
-                  <Text
-                    style={{
-                      paddingBottom: 4,
-                      fontSize: 16,
-                      fontWeight: 600,
-                      color: GlobalStyles.colors.text700,
-                    }}
-                  >
-                    {product.farmId.name}
-                  </Text>
-                  <Text
-                    style={{
-                      paddingBottom: 4,
-                      fontSize: 14,
-                      fontWeight: 400,
-                      color: GlobalStyles.colors.text100,
-                    }}
-                  >
-                    {product.farmId.location}
-                  </Text>
-                </View>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 4,
-                  width: 220,
-                }}
-              >
-                <Octicons
-                  name="star-fill"
-                  size={12}
-                  color={GlobalStyles.colors.yellow}
-                />
-                <Text
-                  style={{ color: GlobalStyles.colors.text100, fontSize: 12 }}
-                >
-                  {product.farmId.rating}
-                </Text>
-                <Text
-                  style={{ color: GlobalStyles.colors.text100, fontSize: 12 }}
-                >
-                  | {product.farmId.followers} Followers
-                </Text>
-                <Text
-                  style={{ color: GlobalStyles.colors.text100, fontSize: 12 }}
-                >
-                  | {product.farmId.workingHours}
-                </Text>
-              </View>
-            </Pressable>
-            <Pressable
-              style={{
-                backgroundColor: GlobalStyles.colors.primary100,
-                justifyContent: "center",
-                alignItems: "center",
-                padding: 8,
-                width: 100,
-                height: 38,
-                borderRadius: 8,
-              }}
-            >
-              <Text
-                style={{ color: GlobalStyles.colors.light, fontWeight: 500 }}
-              >
-                Follow
-              </Text>
-            </Pressable>
-          </View>
           <DetailProductSellingDescription
             descriptionStock={product.stock}
             descriptionShedPen={product.shedPen}
@@ -475,130 +293,8 @@ const DetailProductSelling = ({ route }) => {
             <TitleForList text="Relevant products" navigate />
             {/* farmproductlist */}
           </View>
-          <View
-            style={{
-              backgroundColor: GlobalStyles.colors.light,
-              flex: 1,
-              gap: 8,
-              marginBottom: 8,
-              padding: 14,
-            }}
-          >
-            <TitleForList text="Conversation" navigate />
-            <View
-              style={{
-                borderWidth: 1,
-                borderRadius: 18,
-                padding: 18,
-                shadowColor: GlobalStyles.colors.gray500,
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.2,
-                shadowRadius: 4,
-                borderColor: GlobalStyles.colors.store_line,
-                borderWidth: 0.25,
-              }}
-            >
-              <View style={{ gap: 8, paddingBottom: 18 }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    gap: 6,
-                    alignItems: "center",
-                  }}
-                >
-                  <Image
-                    // source={{uri: product.}}
-                    style={{
-                      height: 32,
-                      width: 32,
-                      backgroundColor: "black",
-                      borderRadius: 32,
-                    }}
-                  />
-                  <View style={{ flexDirection: "row" }}>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: GlobalStyles.colors.text700,
-                      }}
-                    >
-                      Fatimah
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: GlobalStyles.colors.gray100,
-                      }}
-                    >
-                      {" "}
-                      • 29 Aug
-                    </Text>
-                  </View>
-                </View>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: GlobalStyles.colors.text700,
-                  }}
-                >
-                  Is the cow ready?
-                </Text>
-              </View>
-              <View style={{ gap: 8, paddingBottom: 18 }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    gap: 6,
-                    alignItems: "center",
-                    marginLeft: 30,
-                  }}
-                >
-                  <Image
-                    style={{
-                      height: 32,
-                      width: 32,
-                      backgroundColor: "black",
-                      borderRadius: 32,
-                    }}
-                  />
-                  <View style={{ flexDirection: "row" }}>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: GlobalStyles.colors.text700,
-                      }}
-                    >
-                      UG Farm
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: GlobalStyles.colors.gray100,
-                      }}
-                    >
-                      {" "}
-                      • 29 Aug
-                    </Text>
-                  </View>
-                </View>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: GlobalStyles.colors.text700,
-                    marginLeft: 30,
-                  }}
-                >
-                  Yes animals ready, please order?
-                </Text>
-              </View>
+          <ConversationCard />
 
-              <Pressable style={{ alignItems: "flex-end" }}>
-                <Text style={{ color: GlobalStyles.colors.success500 }}>
-                  See All
-                </Text>
-              </Pressable>
-            </View>
-          </View>
           <View
             style={{
               backgroundColor: GlobalStyles.colors.light,
@@ -730,6 +426,7 @@ const DetailProductSelling = ({ route }) => {
         </Button>
 
         <Button
+          onPress={() => navigation.navigate("BuyNow", { product })}
           text="Buy Now"
           color="off"
           styles={{

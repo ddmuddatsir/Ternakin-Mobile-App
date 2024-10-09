@@ -27,7 +27,7 @@ const CartItemSelling = ({
           gap: 6,
         }}
       >
-        <Pressable onPress={onCheckProduct}>
+        <Pressable onPress={() => onCheckProduct(product._id)}>
           <MaterialCommunityIcons
             name={`checkbox-blank${checked ? "" : "-outline"}`}
             size={26}
@@ -50,7 +50,6 @@ const CartItemSelling = ({
             style={{
               height: 86,
               width: 86,
-              // backgroundColor: "black",
               borderRadius: 12,
             }}
           />
@@ -139,7 +138,7 @@ const CartItemSelling = ({
               }}
             >
               <Pressable
-                onPress={() => onDecrement(product._id)}
+                onPress={onDecrement}
                 style={{
                   height: 28,
                   width: 28,
@@ -169,12 +168,12 @@ const CartItemSelling = ({
                   color: GlobalStyles.colors.text700,
                 }}
               >
-                {product.quantity || 0}
+                {product.quantity}
                 {console.log(`${product.quantity}`)}
               </Text>
 
               <Pressable
-                onPress={() => onIncrement(product._id, product.product)}
+                onPress={onIncrement}
                 style={{
                   height: 28,
                   width: 28,

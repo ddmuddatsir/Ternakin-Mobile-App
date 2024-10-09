@@ -12,17 +12,7 @@ const InvestationAndFarmScreen = () => {
         backgroundColor: GlobalStyles.colors.light,
       }}
     >
-      <View
-        style={{
-          paddingVertical: 10,
-          paddingHorizontal: 10,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <HeaderBar back active={true} text={"Nearby farm"} />
-      </View>
+      <HeaderBar back active={true} text={"Nearby farm"} />
     </SafeAreaView>
   );
 };

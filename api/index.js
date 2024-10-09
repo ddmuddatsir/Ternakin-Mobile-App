@@ -317,9 +317,7 @@ app.post("/orders", async (req, res) => {
     }
 
     await order.save();
-    res.json({ success: true, order });
-
-    res.status(200).json({ message: "Product created successfully!" });
+    res.status(200).json({ success: true, order });
   } catch (error) {
     console.error("Error creating orders:", error);
     res.status(500).json({ message: "Error creating orders" });
@@ -332,7 +330,7 @@ app.get("/orders/:userId", async (req, res) => {
     const userId = req.params.userId;
 
     // Find orders by userId and populate user details
-    const orders = await Product.find({ user: userId }).populate("user");
+    const orders = await Order.find({ user: userId }).populate("user");
 
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: "No orders found for this user" });

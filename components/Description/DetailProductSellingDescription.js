@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { GlobalStyles } from "../../constants/style";
 
 const DetailProductSellingDescription = ({
@@ -9,6 +9,10 @@ const DetailProductSellingDescription = ({
   descriptionShedPen,
   descriptionAdvantages,
 }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const toggleDescription = () => {
+    setIsExpanded(!isExpanded);
+  };
   return (
     <View
       style={{

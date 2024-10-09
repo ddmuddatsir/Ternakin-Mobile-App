@@ -23,30 +23,20 @@ const AddressListScreen = () => {
           backgroundColor: GlobalStyles.colors.light,
         }}
       >
-        <View
-          style={{
-            paddingVertical: 10,
-            paddingHorizontal: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+        <HeaderBar back text={"Address List"} />
+        <Pressable
+          onPress={() => navigation.navigate("AddAddress")}
+          style={{ marginRight: 12 }}
         >
-          <HeaderBar back text={"Address List"} />
-          <Pressable
-            onPress={() => navigation.navigate("AddAddress")}
-            style={{ marginRight: 12 }}
+          <Text
+            style={{
+              color: GlobalStyles.colors.success500,
+              fontWeight: "600",
+            }}
           >
-            <Text
-              style={{
-                color: GlobalStyles.colors.success500,
-                fontWeight: "600",
-              }}
-            >
-              Add Address
-            </Text>
-          </Pressable>
-        </View>
+            Add Address
+          </Text>
+        </Pressable>
       </SafeAreaView>
       <ScrollView
         style={{

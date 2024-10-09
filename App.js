@@ -19,6 +19,7 @@ import MyWishlistScreeen from "./screens/MyWishlistScreeen";
 import { UserContext } from "./UserContext";
 import AddressListScreen from "./screens/AddressListScreen";
 import AddAddressScreen from "./screens/AddAddressScreen";
+import BuyNowScreen from "./screens/BuyNowScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -65,6 +66,7 @@ export default function App() {
                   headerShown: false,
                 }}
               />
+              <Stack.Screen name="BuyNow" component={BuyNowScreen} />
               <Stack.Screen
                 name="CommunityAndConsultScreen"
                 component={CommunityAndConsultScreen}

@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GlobalStyles } from "../constants/style";
 import HeaderBar from "../components/HeaderBar/HeaderBar";
 import BottomTabButton from "../components/Button/BottomTabButton";
@@ -16,39 +16,29 @@ import ShippingCardModal from "../components/Modal/ShippingCardModal";
 import AddressCard from "../components/Address/AddressCard";
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { useNavigation } from "@react-navigation/native";
 
 const protectionPrice = 50000;
 const serviceFee = 3000;
 const handleFee = 5000;
 
-const BuyConfirmationScreen = () => {
-  const cart = useSelector((state) => state.cart.cart);
-  const total = useSelector((state) => state.cart.total);
-  const discount = useSelector((state) => state.cart.discount);
+const BuyNowScreen = ({ route }) => {
+  const { product } = route.params;
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
 
-  const getTotalQuantity = () => {
-    return cart.reduce(
-      (totalQuantity, product) => totalQuantity + product.quantity,
-      0
-    );
-  };
-
-  const shippingSubTotalsPrice = cart.reduce(
-    (sum, item) => sum + item.shippingMethodId.cost,
-    0
-  );
-
-  const totalProtectionPrice = cart.reduce(
-    (sum, item) => sum + protectionPrice,
-    0
-  );
+  const discountPrice = product.price - (product.price * product.discPer) / 100;
 
   const totalPayment =
-    total +
-    shippingSubTotalsPrice +
-    totalProtectionPrice +
+    discountPrice +
+    product.shippingMethodId.cost +
+    protectionPrice +
     handleFee +
     serviceFee;
+
+  if (!product.quantity) {
+    product.quantity = 1;
+  }
 
   return (
     <>
@@ -99,127 +89,126 @@ const BuyConfirmationScreen = () => {
                 </Text>
               </View>
               <View style={{ gap: 10 }}>
-                {cart.map((item) => (
+                <View
+                  key={product._id}
+                  style={{
+                    borderBottomColor: GlobalStyles.colors.primary100,
+                    borderBottomWidth: 1,
+                    marginBottom: 10,
+                  }}
+                >
                   <View
-                    key={item._id}
                     style={{
-                      borderBottomColor: GlobalStyles.colors.primary100,
-                      borderBottomWidth: 1,
-                      marginBottom: 10,
+                      flexDirection: "row",
+                      gap: 10,
+                      marginVertical: 4,
                     }}
                   >
-                    <View
+                    <Image
+                      source={{ uri: product.image }}
                       style={{
-                        flexDirection: "row",
-                        gap: 10,
-                        marginVertical: 4,
+                        backgroundColor: "black",
+                        height: 86,
+                        width: 86,
+                        borderRadius: 12,
                       }}
-                    >
-                      <Image
-                        source={{ uri: item.image }}
-                        style={{
-                          backgroundColor: "black",
-                          height: 86,
-                          width: 86,
-                          borderRadius: 12,
-                        }}
-                      />
-                      <View style={{ gap: 8, width: 290 }}>
-                        <Text
-                          style={{
-                            color: GlobalStyles.colors.text700,
-                            fontSize: 16,
-                          }}
-                        >
-                          {item.title}
-                        </Text>
-                        <Text
-                          style={{
-                            color: GlobalStyles.colors.text700,
-                            fontWeight: "600",
-                          }}
-                        >
-                          Rp{item.price - (item.price * item.discPer) / 100}
-                        </Text>
-                        <Text
-                          style={{
-                            color: GlobalStyles.colors.text700,
-                            alignSelf: "flex-end",
-                          }}
-                        >
-                          {item.quantity}x
-                        </Text>
-                      </View>
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        paddingVertical: 12,
-                        gap: 6,
-                        marginVertical: 6,
-                        borderBottomColor: GlobalStyles.colors.background,
-                        borderBottomWidth: 2,
-                        borderTopColor: GlobalStyles.colors.background,
-                        borderTopWidth: 2,
-                      }}
-                    >
-                      <FontAwesome5
-                        style={{
-                          paddingTop: 5,
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                        name="check-double"
-                        size={20}
-                        color={GlobalStyles.colors.success500}
-                      />
-                      <View
-                        style={{
-                          width: 280,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontSize: 13,
-                            color: GlobalStyles.colors.text700,
-                            fontWeight: "500",
-                          }}
-                        >
-                          Include crash protection
-                        </Text>
-
-                        <Text
-                          style={{
-                            fontSize: 11,
-                            color: GlobalStyles.colors.text700,
-                          }}
-                        >
-                          Protect the product from damage to the destination
-                        </Text>
-                      </View>
+                    />
+                    <View style={{ gap: 8, width: 290 }}>
                       <Text
                         style={{
                           color: GlobalStyles.colors.text700,
-                          justifyContent: "flex-end",
+                          fontSize: 16,
+                        }}
+                      >
+                        {product.title}
+                      </Text>
+                      <Text
+                        style={{
+                          color: GlobalStyles.colors.text700,
+                          fontWeight: "600",
+                        }}
+                      >
+                        Rp
+                        {discountPrice}
+                      </Text>
+                      <Text
+                        style={{
+                          color: GlobalStyles.colors.text700,
+                          alignSelf: "flex-end",
+                        }}
+                      >
+                        {product.quantity}x
+                      </Text>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      paddingVertical: 12,
+                      gap: 6,
+                      marginVertical: 6,
+                      borderBottomColor: GlobalStyles.colors.background,
+                      borderBottomWidth: 2,
+                      borderTopColor: GlobalStyles.colors.background,
+                      borderTopWidth: 2,
+                    }}
+                  >
+                    <FontAwesome5
+                      style={{
+                        paddingTop: 5,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                      name="check-double"
+                      size={20}
+                      color={GlobalStyles.colors.success500}
+                    />
+                    <View
+                      style={{
+                        width: 280,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 13,
+                          color: GlobalStyles.colors.text700,
                           fontWeight: "500",
                         }}
                       >
-                        Rp{protectionPrice}
+                        Include crash protection
+                      </Text>
+
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          color: GlobalStyles.colors.text700,
+                        }}
+                      >
+                        Protect the product from damage to the destination
                       </Text>
                     </View>
-                    <ShippingCardModal
-                      shippingCost={item.shippingMethodId.cost}
-                      shippingEstimateTime={
-                        item.shippingMethodId.estimate[0].timeArrive
-                      }
-                      shippingEstimatePeriod={
-                        item.shippingMethodId.estimate[0].periodArrive
-                      }
-                      shippingLocation={item.shippingMethodId.location}
-                      shippingMethod={item.shippingMethodId.method}
-                    />
+                    <Text
+                      style={{
+                        color: GlobalStyles.colors.text700,
+                        justifyContent: "flex-end",
+                        fontWeight: "500",
+                      }}
+                    >
+                      Rp{protectionPrice}
+                    </Text>
                   </View>
-                ))}
+                  <ShippingCardModal
+                    shippingCost={product.shippingMethodId.cost}
+                    shippingEstimateTime={
+                      product.shippingMethodId.estimate[0].timeArrive
+                    }
+                    shippingEstimatePeriod={
+                      product.shippingMethodId.estimate[0].periodArrive
+                    }
+                    shippingLocation={product.shippingMethodId.location}
+                    shippingMethod={product.shippingMethodId.method}
+                  />
+                </View>
               </View>
 
               <View
@@ -236,7 +225,7 @@ const BuyConfirmationScreen = () => {
                     color: GlobalStyles.colors.text700,
                   }}
                 >
-                  Totals Order ({getTotalQuantity()} Product)
+                  Totals Order ({product.quantity} Product)
                 </Text>
                 <Text
                   style={{
@@ -245,7 +234,8 @@ const BuyConfirmationScreen = () => {
                     color: GlobalStyles.colors.primary100,
                   }}
                 >
-                  Rp{total}
+                  Rp
+                  {discountPrice}
                 </Text>
               </View>
             </View>
@@ -354,7 +344,7 @@ const BuyConfirmationScreen = () => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{total}
+                    Rp{discountPrice}
                   </Text>
                   <Text
                     style={{
@@ -362,7 +352,7 @@ const BuyConfirmationScreen = () => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{shippingSubTotalsPrice}
+                    Rp{product.shippingMethodId.cost}
                   </Text>
                   <Text
                     style={{
@@ -370,7 +360,7 @@ const BuyConfirmationScreen = () => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{totalProtectionPrice}
+                    Rp{protectionPrice}
                   </Text>
                   <Text
                     style={{
@@ -450,7 +440,7 @@ const BuyConfirmationScreen = () => {
         </Pressable>
 
         <Button
-          // onPress={() => addItemToCart(route?.params?.product)}
+          // onPress={() => addItemToproduct(route?.params?.product)}
           text="Pay Out"
           color="secondary"
           styles={{
@@ -462,4 +452,30 @@ const BuyConfirmationScreen = () => {
   );
 };
 
-export default BuyConfirmationScreen;
+export default BuyNowScreen;
+
+// const styles = StyleSheet.create({});
+
+// import React from "react";
+// import { View, Text, Button } from "react-native";
+// import { useRoute } from "@react-navigation/native";
+
+// const BuyNowScreen = () => {
+//   const route = useRoute();
+//   const { product } = route.params;
+
+//   return (
+//     <View style={{ padding: 20 }}>
+//       <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+//         Konfirmasi Pembelian
+//       </Text>
+//       <Text style={{ marginVertical: 20 }}>Anda akan membeli:</Text>
+//       <Text style={{ fontSize: 18 }}>{product.title}</Text>
+//       <Text style={{ fontSize: 18 }}>Harga: Rp{product.price}</Text>
+//       <Button title="Kembali" onPress={() => navigation.goBack()} />
+//       {/* Tambahkan informasi lain yang diperlukan di sini */}
+//     </View>
+//   );
+// };
+
+// export default BuyNowScreen;
