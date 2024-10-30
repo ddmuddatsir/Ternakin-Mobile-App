@@ -169,7 +169,7 @@ const CartItemSelling = ({
                 }}
               >
                 {product.quantity}
-                {console.log(`${product.quantity}`)}
+                {/* {console.log(`${product.quantity}`)} */}
               </Text>
 
               <Pressable

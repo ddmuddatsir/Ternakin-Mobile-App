@@ -18,7 +18,14 @@ import productRoutes from "./routes/products.js";
 import addressRoutes from "./routes/address.js";
 import ordersRoutes from "./routes/orders.js";
 import profileRoutes from "./routes/profile.js";
+import walletRoutes from "./routes/wallet.js";
+import topupRoutes from "./routes/topup.js";
+import paymentRoutes from "./routes/payment.js";
+import paymentcreditcardRoutes from "./routes/payment.js";
 import { BASE_URL } from "./config/apiConfig.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Connect to MongoDB
 connectToDatabase();
@@ -26,17 +33,32 @@ connectToDatabase();
 const app = express();
 const port = 8000;
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 // Create a Nodemailer transporter
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "dedemudasir@gmail.com",
-    pass: "melshgwnzglxffjz",
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASS,
+//   },
+// });
+
+try {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  await transporter.verify();
+  console.log("Server is ready to send emails");
+} catch (error) {
+  console.error("Error with email transporter configuration:", error);
+}
 
 // Function to send verification email
 const sendVerificationEmail = async (email, verificationToken) => {
@@ -53,6 +75,19 @@ const sendVerificationEmail = async (email, verificationToken) => {
   } catch (error) {
     console.error("Error sending verification email:", error);
   }
+};
+
+// Middleware untuk verifikasi token
+const verifyToken = (req, res, next) => {
+  const token = req.headers["authorization"];
+  if (!token)
+    return res.status(401).json({ message: "Token tidak disediakan" });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(401).json({ message: "Token tidak valid" });
+    req.user = decoded;
+    next();
+  });
 };
 
 // Register a new user
@@ -116,25 +151,6 @@ app.get("/verify/:token", async (req, res) => {
   }
 });
 
-app.post("/verify/token", (req, res) => {
-  const token = req.headers["authorization"];
-  if (!token) return res.status(401).json({ message: "No token provided" });
-
-  // Verifikasi token
-  jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) return res.status(401).json({ message: "Invalid token" });
-    res.status(200).json({ message: "Token valid", user: decoded });
-  });
-});
-
-const generateSecretKey = () => {
-  const secretKey = crypto.randomBytes(32).toString("hex");
-
-  return secretKey;
-};
-
-const secretKey = generateSecretKey();
-
 // Login endpoint
 app.post("/login", async (req, res) => {
   try {
@@ -153,7 +169,9 @@ app.post("/login", async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, "your_static_secret_key");
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     // Kirim token dan data pengguna
     res.status(200).json({
@@ -168,10 +186,43 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/send-email", async (req, res) => {
+  const { email, orderDetails } = req.body;
+
+  const mailOptions = {
+    from: "dedemudasir@gmail.com",
+    to: email,
+    subject: "Detail pesanan anda di ternakin",
+    // text: `Thanks for orders with ternakin, Your order detail :\n\n${orderDetails}`,
+    text: `Thank you for your order!\n\nOrder Details:\n${JSON.stringify(
+      orderDetails,
+      null,
+      2
+    )}`,
+    html: `<h1>Thank you for your order!</h1><pre>${JSON.stringify(
+      orderDetails,
+      null,
+      2
+    )}</pre>`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions, (error, info));
+    res.status(200).send("Email sent successfully");
+  } catch (error) {
+    console.error("Error sending email", error.message);
+    res.status(500).send("Error sending email");
+  }
+});
+
 app.use(productRoutes);
 app.use(addressRoutes);
 app.use(ordersRoutes);
 app.use(profileRoutes);
+app.use(walletRoutes);
+app.use(topupRoutes);
+app.use(paymentRoutes);
+app.use(paymentcreditcardRoutes);
 
 // Start server
 app.listen(port, () => {

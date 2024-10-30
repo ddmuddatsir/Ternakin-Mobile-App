@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   Pressable,
   SafeAreaView,
@@ -7,7 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GlobalStyles } from "../constants/style";
 import HeaderBar from "../components/HeaderBar/HeaderBar";
 import BottomTabButton from "../components/Button/BottomTabButton";
@@ -16,15 +17,33 @@ import ShippingCardModal from "../components/Modal/ShippingCardModal";
 import AddressCard from "../components/Address/AddressCard";
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { cleanCart, saveOrderToBackend } from "../redux/CartReducer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { BASE_URL } from "../api/config/apiConfig";
 
 const protectionPrice = 50000;
 const serviceFee = 3000;
 const handleFee = 5000;
 
 const BuyConfirmationScreen = () => {
+  const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
   const total = useSelector((state) => state.cart.total);
   const discount = useSelector((state) => state.cart.discount);
+  const status = useSelector((state) => state.cart.status);
+
+  useEffect(() => {
+    if (status === "succeeded") {
+      sendEmail();
+      Alert.alert("Orders Successfully", "Your orders on process");
+    } else if (status === "failed") {
+      Alert.alert(
+        "Error",
+        "Terjadi kesalahan saat memproses pesanan. Silakan coba lagi."
+      );
+    }
+  }, [status]);
 
   const getTotalQuantity = () => {
     return cart.reduce(
@@ -49,6 +68,40 @@ const BuyConfirmationScreen = () => {
     totalProtectionPrice +
     handleFee +
     serviceFee;
+
+  const handleCheckout = async () => {
+    const orderData = {
+      userId: await AsyncStorage.getItem("userId"),
+      products: cart.map(({ _id, quantity }) => ({ productId: _id, quantity })),
+      totalAmount: totalPayment,
+    };
+    dispatch(saveOrderToBackend(orderData));
+    console.log(orderData);
+  };
+
+  const sendEmail = async () => {
+    const orderDetails = cart
+      .map((item) => `${item.name} - ${item.quantity} x ${item.price}`)
+      .join("\n");
+
+    try {
+      await axios.post(`${BASE_URL}/send-email`, {
+        // email: await AsyncStorage.getItem("userEmail"),
+        email: "dedemudasir@gmail.com",
+        orderDetails,
+      });
+      console.log("Email sent successfully");
+    } catch (error) {
+      console.error(
+        "Error sending email:",
+        error.response ? error.response.data : error.message
+      );
+      Alert.alert(
+        "Error",
+        "Terjadi kesalahan saat mengirim email. Silakan coba lagi."
+      );
+    }
+  };
 
   return (
     <>
@@ -81,6 +134,7 @@ const BuyConfirmationScreen = () => {
           </Text>
           <View>
             <AddressCard />
+
             <View
               style={{
                 borderBottomWidth: 6,
@@ -450,7 +504,7 @@ const BuyConfirmationScreen = () => {
         </Pressable>
 
         <Button
-          // onPress={() => addItemToCart(route?.params?.product)}
+          onPress={handleCheckout}
           text="Pay Out"
           color="secondary"
           styles={{

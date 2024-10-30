@@ -11,7 +11,11 @@ const orderSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User", require: true },
   products: [
     {
-      productId: { type: Schema.Types.ObjectId, ref: "Product" },
+      productId: {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+        required: true,
+      },
       quantity: { type: Number, required: true }, // Menambahkan required
       price: { type: Number, required: true }, // Menambahkan required
     },

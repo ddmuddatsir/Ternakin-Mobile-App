@@ -94,7 +94,7 @@ const TabBottom = () => (
       }}
     />
     <BottomTabs.Screen
-      name="ProfileScreen"
+      name="profile"
       component={ProfileScreen}
       options={{
         tabBarLabel: "Profile",

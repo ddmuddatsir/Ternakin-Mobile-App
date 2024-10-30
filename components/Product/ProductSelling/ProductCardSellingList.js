@@ -12,7 +12,7 @@ const ProductCardSellingList = () => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(`${BASE_URL}/products`);
-        console.log(response.data);
+        // console.log(response.data);
         setProduct(response.data);
         setLoading(false);
       } catch (error) {
@@ -22,7 +22,7 @@ const ProductCardSellingList = () => {
     };
 
     fetchProduct();
-    console.log(product);
+    // console.log(product);
   }, []);
 
   if (loading) {

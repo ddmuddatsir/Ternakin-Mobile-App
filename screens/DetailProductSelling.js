@@ -37,6 +37,7 @@ const DetailProductSelling = ({ route }) => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   useEffect(() => {
     const fetchProductDetail = async () => {
@@ -66,13 +67,20 @@ const DetailProductSelling = ({ route }) => {
 
   const addItemToCart = (product) => {
     setAddedToCart(true);
-    dispatch(addToCart({ ...product, quantity: 2 }));
+    dispatch(
+      addToCart({
+        ...product,
+        quantity: selectedQuantity,
+        totalAmount: discountedPrice * selectedQuantity,
+      })
+    );
+
     setTimeout(() => {
       setAddedToCart(false);
     }, 60000);
   };
 
-  console.log(cart);
+  // console.log(cart);
 
   return (
     <>
@@ -436,7 +444,6 @@ const DetailProductSelling = ({ route }) => {
 
         <Button
           onPress={() => addItemToCart(product)}
-          // onPress={addItemToCart}
           text="Add to Cart"
           color="secondary"
           styles={{

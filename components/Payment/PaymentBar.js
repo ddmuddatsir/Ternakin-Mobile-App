@@ -1,9 +1,11 @@
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { GlobalStyles } from "../../constants/style";
+import { useNavigation } from "@react-navigation/native";
 
 const PaymentBar = () => {
+  const navigation = useNavigation();
   return (
     <View
       style={{
@@ -15,7 +17,8 @@ const PaymentBar = () => {
         gap: 10,
       }}
     >
-      <View
+      <Pressable
+        onPress={() => navigation.navigate("SaldoScreen")}
         style={{
           backgroundColor: GlobalStyles.colors.light,
           height: 58,
@@ -38,7 +41,7 @@ const PaymentBar = () => {
           <Text>Rp. 300.000</Text>
           <Ionicons name="wallet-outline" size={18} color="brown" />
         </View>
-      </View>
+      </Pressable>
 
       <View
         style={{

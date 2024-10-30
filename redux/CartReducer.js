@@ -1,5 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { setOrderDetails, setCheckoutSuccess } from "./checkoutSlice";
+import axios from "axios";
+import { BASE_URL } from "../api/config/apiConfig";
 
 const calculateTotal = (cart) => {
   const totalBeforeDiscount = cart.reduce(
@@ -22,6 +24,14 @@ const calculateDiscount = (cart) => {
   return totalDiscount;
 };
 
+export const saveOrderToBackend = createAsyncThunk(
+  "cart/saveOrderToBackend",
+  async (orderData) => {
+    const response = await axios.post(`${BASE_URL}/orders`, orderData);
+    return response.data;
+  }
+);
+
 export const CartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -29,6 +39,7 @@ export const CartSlice = createSlice({
     total: 0,
     discount: 0,
     orders: [],
+    status: null,
   },
 
   reducers: {
@@ -86,40 +97,29 @@ export const CartSlice = createSlice({
       state.total = 0;
       state.discount = 0;
     },
-    //     addOrder: (state, action) => {
-    //       const { orderDetails } = action.payload;
-    //       state.orders.push({
-    //         id: new Date().toISOString(),
-    //         products: state.cart,
-    //         total: state.total,
-    //         discount: state.discount,
-    //         ...orderDetails,
-    //       });
-    //       state.cart = [];
-    //       state.total = 0;
-    //       state.discount = 0;
-    //     },
-    //   },
-    // });
+    extraReducers: (builder) => {
+      builder
+        .addCase(saveOrderToBackend.pending, (state) => {
+          state.status = "loading";
+        })
+        .addCase(saveOrderToBackend.fulfilled, (state, action) => {
+          const newOrder = action.payload;
 
-    addOrder: (state, action) => {
-      const { orderDetails } = action.payload;
-      const newOrder = {
-        id: new Date().toISOString(),
-        products: state.cart,
-        total: state.total,
-        discount: state.discount,
-        ...orderDetails,
-      };
-      state.orders.push(newOrder);
-      // Reset cart after adding order
-      state.cart = [];
-      state.total = 0;
-      state.discount = 0;
+          state.orders.push(newOrder); //save order to redux
+          state.status = "succeeded";
 
-      // Dispatch actions to set order details in checkout slice
-      setOrderDetails(newOrder); // Set order details in checkout
-      setCheckoutSuccess(); // Mark checkout as successful
+          //clean cart after orders saved
+          state.cart = [];
+          state.total = 0;
+          state.discount = 0;
+
+          //success checkout order
+          setOrderDetails(newOrder);
+          setCheckoutSuccess();
+        })
+        .addCase(saveOrderToBackend.rejected, (state) => {
+          state.status = "failed";
+        });
     },
   },
 });
@@ -130,7 +130,7 @@ export const {
   incrementQuantity,
   decrementQuantity,
   cleanCart,
-  addOrder,
+  extraReducers,
 } = CartSlice.actions;
 
 export default CartSlice.reducer;

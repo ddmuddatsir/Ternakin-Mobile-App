@@ -17,6 +17,7 @@ import axios from "axios";
 import { GlobalStyles } from "../constants/style";
 import MainLogo from "../assets/Logo.png";
 import { BASE_URL } from "../api/config/apiConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const RegisterScreen = () => {
   const [name, setName] = useState("");
@@ -24,7 +25,9 @@ const RegisterScreen = () => {
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
 
-  const handleRegister = async () => {
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
     const user = {
       name: name,
       email: email,
@@ -34,11 +37,12 @@ const RegisterScreen = () => {
     // send a request to the backend API
     try {
       const response = await axios.post(`${BASE_URL}/register`, user);
-      console.log(response, response.data);
+
       Alert.alert("Registation Succesfully", "You have registered succesfully");
       setName("");
       setPassword("");
       setEmail("");
+      navigation.navigate("Login");
     } catch (error) {
       console.error(
         "Registration failed:",

@@ -20,6 +20,7 @@ import { UserContext } from "./UserContext";
 import AddressListScreen from "./screens/AddressListScreen";
 import AddAddressScreen from "./screens/AddAddressScreen";
 import BuyNowScreen from "./screens/BuyNowScreen";
+import SaldoScreen from "./screens/SaldoScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -67,6 +68,13 @@ export default function App() {
                 }}
               />
               <Stack.Screen name="BuyNow" component={BuyNowScreen} />
+              <Stack.Screen
+                name="SaldoScreen"
+                component={SaldoScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
               <Stack.Screen
                 name="CommunityAndConsultScreen"
                 component={CommunityAndConsultScreen}

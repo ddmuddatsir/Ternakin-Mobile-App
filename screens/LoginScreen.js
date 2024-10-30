@@ -24,6 +24,7 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
+
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
@@ -37,25 +38,75 @@ const LoginScreen = () => {
       }
     };
     checkLoginStatus();
-  }, []);
-  const handleLogin = () => {
-    const user = {
-      email: email,
-      password: password,
-    };
+  }, [navigation]);
 
-    axios
-      .post(`${BASE_URL}/login`, user)
-      .then((response) => {
-        console.log(response);
-        const token = response.data.token;
-        AsyncStorage.setItem("authToken", token);
+  // const handleLogin = () => {
+  //   const user = {
+  //     email: email,
+  //     password: password,
+  //   };
+
+  //   axios
+  //     .post(`${BASE_URL}/login`, user)
+  //     .then(async (response) => {
+  //       const { token, userId } = response.data;
+
+  //       console.log("Login Response:", response.data);
+
+  //       if (userId) {
+  //         try {
+  //           await AsyncStorage.setItem("authToken", token);
+  //           await AsyncStorage.setItem("userId", userId);
+
+  //           // Verifikasi penyimpanan berhasil
+  //           console.log("UserId stored successfully:", userId);
+
+  //           navigation.replace("Main");
+  //         } catch (error) {
+  //           console.log("Error storing userId or token:", err);
+  //         }
+  //       } else {
+  //         Alert.alert("Login Error", "User ID not found in the response");
+  //       }
+  //       // await AsyncStorage.setItem("authToken", token);
+  //       // await AsyncStorage.setItem("userId", userId);
+
+  //       // navigation.replace("Main");
+  //     })
+  //     .catch((error) => {
+  //       Alert.alert("Login Error", "Invalid Email");
+  //       console.log(error);
+  //     });
+  // };
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Email dan Password harus diisi.");
+      return;
+    }
+
+    const loginCredentials = { email, password };
+
+    try {
+      const response = await axios.post(`${BASE_URL}/login`, loginCredentials);
+      const { token, userId, name, email } = response.data; // Pastikan Anda mendapatkan nama dan email dari respons
+
+      if (token && userId) {
+        await AsyncStorage.setItem("authToken", token);
+        await AsyncStorage.setItem("userId", userId);
+        await AsyncStorage.setItem("userName", name); // Menyimpan nama pengguna
+        await AsyncStorage.setItem("userEmail", email); // Menyimpan email pengguna
+
         navigation.replace("Main");
-      })
-      .catch((error) => {
-        Alert.alert("Login Error", "Invalid Email");
-        console.log(error);
-      });
+      } else {
+        Alert.alert(
+          "Login Error",
+          "User ID or Token not found in the response"
+        );
+      }
+    } catch (error) {
+      Alert.alert("Login Error", "Invalid Email or Password");
+    }
   };
 
   return (

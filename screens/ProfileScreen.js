@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Alert,
   Image,
   Pressable,
   SafeAreaView,
@@ -7,7 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import HeaderBar from "../components/HeaderBar/HeaderBar";
 import { GlobalStyles } from "../constants/style";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -17,30 +18,41 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { UserType } from "../UserContext";
-import axios from "axios";
 
 const ProfileScreen = () => {
-  const { userId } = useContext(UserType);
-
+  const [userData, setUserData] = useState({ name: "", email: "" });
   const navigation = useNavigation();
 
-  const [user, setUser] = useState();
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchUserData = async () => {
       try {
-        const response = await axios.get(
-          `http://192.168.1.6:8000/profile/${userId}`
-        );
-        const { user } = response.data;
-        setUser(user);
+        const name = await AsyncStorage.getItem("userName"); // Pastikan Anda menyimpan 'userName' saat login
+        const email = await AsyncStorage.getItem("userEmail"); // Pastikan Anda menyimpan 'userEmail' saat login
+
+        if (name && email) {
+          setUserData({ name, email });
+        } else {
+          Alert.alert("Error", "User data not found.");
+        }
       } catch (error) {
-        console.log("error", error);
+        console.log("Error fetching user data:", error);
       }
     };
 
-    fetchUserProfile();
+    fetchUserData();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("authToken");
+      await AsyncStorage.removeItem("userId");
+      await AsyncStorage.removeItem("userName");
+      await AsyncStorage.removeItem("userEmail");
+      navigation.replace("LoginScreen");
+    } catch (error) {
+      console.log("Error during logout:", error);
+    }
+  };
 
   return (
     <>
@@ -85,7 +97,7 @@ const ProfileScreen = () => {
                 fontWeight: "600",
               }}
             >
-              {user?.title}
+              {userData.name}
             </Text>
             <Text
               style={{
@@ -101,7 +113,7 @@ const ProfileScreen = () => {
                 fontSize: 13,
               }}
             >
-              {user?.name}
+              {userData.email}
             </Text>
           </View>
           <Ionicons
@@ -504,6 +516,42 @@ const ProfileScreen = () => {
               />
             </View>
           </View>
+          <Pressable
+            onPress={handleLogout}
+            style={{
+              flexDirection: "row",
+              paddingBottom: 8,
+              borderBottomWidth: 1,
+              borderBottomColor: GlobalStyles.colors.store_line,
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+            >
+              <AntDesign
+                name="questioncircleo"
+                size={20}
+                color={GlobalStyles.colors.text100}
+              />
+              <Text
+                style={{
+                  color: GlobalStyles.colors.text100,
+                  fontSize: 16,
+                }}
+              >
+                Log Out
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <MaterialIcons
+                name="keyboard-arrow-right"
+                size={18}
+                color={GlobalStyles.colors.gray100}
+              />
+            </View>
+          </Pressable>
         </View>
       </ScrollView>
     </>

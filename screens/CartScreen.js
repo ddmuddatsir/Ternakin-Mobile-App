@@ -32,11 +32,7 @@ const CartScreen = () => {
   };
 
   const handleDecrementQuantity = (product, quantity) => {
-    if (quantity === 1) {
-      dispatch(removeFromCart({ _id: product._id }));
-    } else {
-      dispatch(decrementQuantity({ _id: product._id }));
-    }
+    dispatch(decrementQuantity({ _id: product._id }));
   };
 
   const hasProduct = cart.length > 0;
