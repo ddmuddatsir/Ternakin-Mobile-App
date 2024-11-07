@@ -1,26 +1,11 @@
 import express from "express";
 import User from "../models/user.js";
+import { authenticate } from "../middleware/authenticate.js";
 
 const router = express.Router();
 
-// Middleware untuk verifikasi token JWT
-const authenticateToken = (req, res, next) => {
-  const token = req.headers["authorization"];
-  if (!token) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-
-  jwt.verify(token, secretKey, (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: "Invalid token" });
-    }
-    req.user = user; // menyimpan informasi pengguna ke req.user
-    next(); // melanjutkan ke rute berikutnya
-  });
-};
-
 //user profile
-router.get("/profile", authenticateToken, async (req, res) => {
+router.get("/profile", authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
     if (!user) {

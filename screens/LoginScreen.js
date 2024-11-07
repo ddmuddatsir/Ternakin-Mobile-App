@@ -19,11 +19,15 @@ import { GlobalStyles } from "../constants/style";
 import MainLogo from "../assets/Logo.png";
 import { UserType } from "../UserContext";
 import { BASE_URL } from "../api/config/apiConfig";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../redux/AuthReducer";
+import axiosInstance from "../utils/axiosInstance";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -31,7 +35,7 @@ const LoginScreen = () => {
         const token = await AsyncStorage.getItem("authToken");
 
         if (token) {
-          navigation.replace("Main");
+          navigation.replace("Main"); // Jika sudah login, arahkan ke layar utama
         }
       } catch (err) {
         console.log("error message", err);
@@ -39,45 +43,6 @@ const LoginScreen = () => {
     };
     checkLoginStatus();
   }, [navigation]);
-
-  // const handleLogin = () => {
-  //   const user = {
-  //     email: email,
-  //     password: password,
-  //   };
-
-  //   axios
-  //     .post(`${BASE_URL}/login`, user)
-  //     .then(async (response) => {
-  //       const { token, userId } = response.data;
-
-  //       console.log("Login Response:", response.data);
-
-  //       if (userId) {
-  //         try {
-  //           await AsyncStorage.setItem("authToken", token);
-  //           await AsyncStorage.setItem("userId", userId);
-
-  //           // Verifikasi penyimpanan berhasil
-  //           console.log("UserId stored successfully:", userId);
-
-  //           navigation.replace("Main");
-  //         } catch (error) {
-  //           console.log("Error storing userId or token:", err);
-  //         }
-  //       } else {
-  //         Alert.alert("Login Error", "User ID not found in the response");
-  //       }
-  //       // await AsyncStorage.setItem("authToken", token);
-  //       // await AsyncStorage.setItem("userId", userId);
-
-  //       // navigation.replace("Main");
-  //     })
-  //     .catch((error) => {
-  //       Alert.alert("Login Error", "Invalid Email");
-  //       console.log(error);
-  //     });
-  // };
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -88,15 +53,21 @@ const LoginScreen = () => {
     const loginCredentials = { email, password };
 
     try {
-      const response = await axios.post(`${BASE_URL}/login`, loginCredentials);
-      const { token, userId, name, email } = response.data; // Pastikan Anda mendapatkan nama dan email dari respons
+      // Menggunakan axiosInstance untuk mengirim permintaan login
+      const response = await axiosInstance.post("/login", loginCredentials);
+      const { token, userId, name, email } = response.data;
 
       if (token && userId) {
+        // Simpan token dan informasi pengguna di AsyncStorage
         await AsyncStorage.setItem("authToken", token);
         await AsyncStorage.setItem("userId", userId);
-        await AsyncStorage.setItem("userName", name); // Menyimpan nama pengguna
-        await AsyncStorage.setItem("userEmail", email); // Menyimpan email pengguna
+        await AsyncStorage.setItem("userName", name);
+        await AsyncStorage.setItem("userEmail", email);
 
+        // Dispatch login action ke Redux
+        dispatch(login({ token, userId, name, email }));
+
+        // Arahkan ke layar utama setelah login berhasil
         navigation.replace("Main");
       } else {
         Alert.alert(

@@ -1,27 +1,32 @@
-import { Text, View } from "react-native";
+import { Text, View, ActivityIndicator } from "react-native";
 import React, { useState, useEffect } from "react";
 import ProductCardSelling from "./ProductCardSelling";
-import axios from "axios";
 import { BASE_URL } from "../../../api/config/apiConfig";
+import { useDispatch, useSelector } from "react-redux";
+import axiosInstance from "../../../utils/axiosInstance";
 
 const ProductCardSellingList = () => {
   const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const authToken = useSelector((state) => state.auth.token);
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/products`);
-        // console.log(response.data);
+        const headers = authToken
+          ? { Authorization: `Bearer ${authToken}` }
+          : {};
+        const response = await axiosInstance.get(`${BASE_URL}/products`);
         setProduct(response.data);
         setLoading(false);
+        // Proses data produk
       } catch (error) {
-        console.error("Error fetching product", error);
-        setLoading(false);
+        console.error("Error fetching products:", error);
       }
     };
+    fetchProducts();
 
-    fetchProduct();
     // console.log(product);
   }, []);
 

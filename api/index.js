@@ -22,6 +22,7 @@ import walletRoutes from "./routes/wallet.js";
 import topupRoutes from "./routes/topup.js";
 import paymentRoutes from "./routes/payment.js";
 import paymentcreditcardRoutes from "./routes/payment.js";
+import wishlistRoutes from "./routes/wishlist.js";
 import { BASE_URL } from "./config/apiConfig.js";
 import dotenv from "dotenv";
 
@@ -75,19 +76,6 @@ const sendVerificationEmail = async (email, verificationToken) => {
   } catch (error) {
     console.error("Error sending verification email:", error);
   }
-};
-
-// Middleware untuk verifikasi token
-const verifyToken = (req, res, next) => {
-  const token = req.headers["authorization"];
-  if (!token)
-    return res.status(401).json({ message: "Token tidak disediakan" });
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ message: "Token tidak valid" });
-    req.user = decoded;
-    next();
-  });
 };
 
 // Register a new user
@@ -186,6 +174,37 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/refresh-token", async (req, res) => {
+  const refreshToken = req.cookie.refreshToken;
+
+  if (!refreshToken) {
+    return res.status(401).json({ message: "No refresh token provided." });
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    // Anda bisa memeriksa apakah pengguna masih ada di database jika perlu
+
+    const user = await User.findById(decoded.userId); // Mengambil user dari database
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Buat token baru
+    const newAccessToken = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+
+    res.json({ accessToken: newAccessToken });
+  } catch (error) {
+    return res.status(403).json({ message: "Invalid token." });
+  }
+});
+
 app.post("/send-email", async (req, res) => {
   const { email, orderDetails } = req.body;
 
@@ -223,6 +242,7 @@ app.use(walletRoutes);
 app.use(topupRoutes);
 app.use(paymentRoutes);
 app.use(paymentcreditcardRoutes);
+app.use(wishlistRoutes);
 
 // Start server
 app.listen(port, () => {

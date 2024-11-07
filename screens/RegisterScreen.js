@@ -38,11 +38,21 @@ const RegisterScreen = () => {
     try {
       const response = await axios.post(`${BASE_URL}/register`, user);
 
+      const token = response.data.token;
+      if (token) {
+        await AsyncStorage.setItem("authToken", token);
+        Alert.alert(
+          "Registration Successful",
+          "You have registered successfully"
+        );
+        navigation.navigate("Main");
+      }
+
       Alert.alert("Registation Succesfully", "You have registered succesfully");
       setName("");
       setPassword("");
       setEmail("");
-      navigation.navigate("Login");
+      navigation.navigate("LoginScreen");
     } catch (error) {
       console.error(
         "Registration failed:",

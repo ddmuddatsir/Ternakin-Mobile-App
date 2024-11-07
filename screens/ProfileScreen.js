@@ -20,7 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileScreen = () => {
-  const [userData, setUserData] = useState({ name: "", email: "" });
+  const [userData, setUserData] = useState({ name: "", email: "", token: "" });
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -28,9 +28,10 @@ const ProfileScreen = () => {
       try {
         const name = await AsyncStorage.getItem("userName"); // Pastikan Anda menyimpan 'userName' saat login
         const email = await AsyncStorage.getItem("userEmail"); // Pastikan Anda menyimpan 'userEmail' saat login
+        const token = await AsyncStorage.getItem("authToken"); // Pastikan Anda menyimpan 'userEmail' saat login
 
-        if (name && email) {
-          setUserData({ name, email });
+        if (name && email && token) {
+          setUserData({ name, email, token });
         } else {
           Alert.alert("Error", "User data not found.");
         }
@@ -98,6 +99,15 @@ const ProfileScreen = () => {
               }}
             >
               {userData.name}
+            </Text>
+            <Text
+              style={{
+                colors: GlobalStyles.colors.text700,
+                fontSize: 10,
+                fontWeight: "600",
+              }}
+            >
+              {userData.token}
             </Text>
             <Text
               style={{

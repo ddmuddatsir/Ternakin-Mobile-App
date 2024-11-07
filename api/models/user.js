@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+import Product from "./product.js";
+import Cart from "./cartlist.js";
+import Order from "./order.js";
+import Wallet from "./wallet.js";
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -39,6 +44,10 @@ const userSchema = new mongoose.Schema(
         ref: "Product",
       },
     ],
+    wishlist: { type: mongoose.Schema.Types.ObjectId, ref: "Wishlist" },
+    cartlist: { type: mongoose.Schema.Types.ObjectId, ref: "Cart" },
+    orders: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
+    wallet: { type: mongoose.Schema.Types.ObjectId, ref: "Wallet" },
     createdAt: {
       type: Date,
       default: Date.now,

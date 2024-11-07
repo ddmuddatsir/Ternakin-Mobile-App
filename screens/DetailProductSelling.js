@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   Pressable,
+  Alert,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import HeaderBar from "../components/HeaderBar/HeaderBar";
@@ -27,23 +28,38 @@ import FarmCard from "../components/UI/FarmCard";
 import ConversationCard from "../components/UI/ConversationCard";
 import ProductShare from "../components/UI/ProductShare";
 import { BASE_URL } from "../api/config/apiConfig";
+import { useProductDetail } from "../hooks/useProductDetails";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axiosInstance from "../utils/axiosInstance";
 
 const DetailProductSelling = ({ route }) => {
-  const navigation = useNavigation();
   const { productId } = route.params;
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
+  const authToken = useSelector((state) => state.auth.token);
+  const navigation = useNavigation();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [addedToCart, setAddedToCart] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/products/${productId}`);
+        const response = await axiosInstance.get(
+          `${BASE_URL}/products/${productId}`
+        );
         setProduct(response.data);
+
+        const wishlistResponse = await axiosInstance.get(
+          `${BASE_URL}/wishlist`
+        );
+        const isProductInWishlist =
+          Array.isArray(wishlistResponse.data) &&
+          wishlistResponse.data.some((item) => item.productId === productId);
+        setIsWishlisted(isProductInWishlist);
       } catch (error) {
         console.error("Error fetching product details:", error);
       } finally {
@@ -215,9 +231,17 @@ const DetailProductSelling = ({ route }) => {
                   </Text>
                 </View>
 
-                <View style={{ flexDirection: "row", gap: 6 }}>
+                <Pressable
+                  // onPress={handleWishlistPress}
+                  style={{ flexDirection: "row", gap: 6 }}
+                >
+                  {/* <Ionicons
+                    name={isWishlisted ? "heart" : "heart-outline"}
+                    size={24}
+                    color={isWishlisted ? "red" : GlobalStyles.colors.gray500}
+                  /> */}
                   <Ionicons
-                    name="heart-outline"
+                    name={"heart-outline"}
                     size={24}
                     color={GlobalStyles.colors.gray500}
                   />
@@ -226,7 +250,7 @@ const DetailProductSelling = ({ route }) => {
                     size={24}
                     color={GlobalStyles.colors.gray500}
                   />
-                </View>
+                </Pressable>
               </View>
               <View
                 style={{

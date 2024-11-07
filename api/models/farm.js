@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+import Product from "./product.js";
 const Schema = mongoose.Schema;
 
 const farmSchema = new Schema(

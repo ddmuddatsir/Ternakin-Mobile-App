@@ -2,10 +2,11 @@ import express from "express";
 import Order from "../models/order.js";
 import Payment from "../models/payment.js";
 import Wallet from "../models/wallet.js";
+import { authenticate } from "../middleware/authenticate.js";
 
 const router = express.Router();
 
-router.post("/payment/wallet", async (req, res) => {
+router.post("/payment/wallet", authenticate, async (req, res) => {
   try {
     const { userId, orderId, amount } = req.body;
 

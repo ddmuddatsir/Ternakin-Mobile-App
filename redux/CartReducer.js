@@ -97,30 +97,30 @@ export const CartSlice = createSlice({
       state.total = 0;
       state.discount = 0;
     },
-    extraReducers: (builder) => {
-      builder
-        .addCase(saveOrderToBackend.pending, (state) => {
-          state.status = "loading";
-        })
-        .addCase(saveOrderToBackend.fulfilled, (state, action) => {
-          const newOrder = action.payload;
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(saveOrderToBackend.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(saveOrderToBackend.fulfilled, (state, action) => {
+        const newOrder = action.payload;
 
-          state.orders.push(newOrder); //save order to redux
-          state.status = "succeeded";
+        state.orders.push(newOrder); //save order to redux
+        state.status = "succeeded";
 
-          //clean cart after orders saved
-          state.cart = [];
-          state.total = 0;
-          state.discount = 0;
+        //clean cart after orders saved
+        state.cart = [];
+        state.total = 0;
+        state.discount = 0;
 
-          //success checkout order
-          setOrderDetails(newOrder);
-          setCheckoutSuccess();
-        })
-        .addCase(saveOrderToBackend.rejected, (state) => {
-          state.status = "failed";
-        });
-    },
+        //success checkout order
+        setOrderDetails(newOrder);
+        setCheckoutSuccess();
+      })
+      .addCase(saveOrderToBackend.rejected, (state) => {
+        state.status = "failed";
+      });
   },
 });
 
@@ -130,7 +130,6 @@ export const {
   incrementQuantity,
   decrementQuantity,
   cleanCart,
-  extraReducers,
 } = CartSlice.actions;
 
 export default CartSlice.reducer;

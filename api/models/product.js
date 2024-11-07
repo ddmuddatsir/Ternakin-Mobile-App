@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 
+import ShippingMethod from "./shippingMethod.js";
+import Farm from "./farm.js";
+
 const Schema = mongoose.Schema;
 
 const productSchema = new Schema(

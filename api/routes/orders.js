@@ -2,36 +2,12 @@ import express from "express";
 import Product from "../models/product.js";
 import User from "../models/user.js";
 import Order from "../models/order.js";
-import jwt from "jsonwebtoken";
-
-import dotenv from "dotenv";
-dotenv.config();
+import { authenticate } from "../middleware/authenticate.js";
 
 const router = express.Router();
 
-//Middleware auth
-const protect = async (req, res, next) => {
-  let token;
-
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select("-password");
-      next();
-    } catch (error) {
-      return res.status(401).json({ message: "Not authorized, token failed" });
-    }
-  } else {
-    return res.status(401).json({ message: "Not authorized, no token" });
-  }
-};
-
 //new order
-router.post("/", protect, async (req, res) => {
+router.post("/", authenticate, async (req, res) => {
   const { products, totalAmount, shippingAddress, shippingMethodId } = req.body;
   const userId = req.user.id;
 
@@ -54,7 +30,7 @@ router.post("/", protect, async (req, res) => {
 });
 
 //get data order user
-router.get("/", protect, async (req, res) => {
+router.get("/", authenticate, async (req, res) => {
   const userId = req.user.id;
 
   try {
@@ -70,7 +46,7 @@ router.get("/", protect, async (req, res) => {
 });
 
 //update status order
-router.put("/:orderId", protect, async (req, res) => {
+router.put("/:orderId", authenticate, async (req, res) => {
   const { orderId } = req.params;
   const { status } = req.body;
 

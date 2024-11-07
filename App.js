@@ -10,7 +10,7 @@ import DetailProductSelling from "./screens/DetailProductSelling";
 import InvestationAndFarmScreen from "./screens/InvestationAndFarmScreen";
 import CommunityAndConsultScreen from "./screens/CommunityAndConsultScreen";
 import { Provider } from "react-redux";
-import store from "./store";
+import { store } from "./store";
 import CartScreen from "./screens/CartScreen";
 import ChatScreen from "./screens/ChatScreen";
 import BuyConfirmationScreen from "./screens/BuyConfirmationScreen";
