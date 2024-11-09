@@ -11,7 +11,7 @@ const farmSchema = new Schema(
     followers: String,
     workingHours: String,
     image: String,
-    productsId: [{ type: Schema.Types.ObjectId, ref: "Product" }], // Referensi ke model Product
+    productId: [{ type: Schema.Types.ObjectId, ref: "Product" }], // Referensi ke model Product
   },
   { collection: "farm" }
 );

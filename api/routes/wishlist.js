@@ -6,95 +6,76 @@ import { authenticate } from "../middleware/authenticate.js";
 
 const router = express.Router();
 
-router.post("/wishlist/add", authenticate, async (req, res) => {
-  const { productId } = req.body;
-  const userId = req.user.userId;
-
-  console.log("Received productId:", productId); // Log untuk memeriksa productId
-  console.log("Received userId:", userId); // Log untuk memeriksa userId
-
-  if (!productId) {
-    return res.status(400).json({ message: "Product ID is required" });
-  }
-
+router.post("/wishlist", authenticate, async (req, res) => {
   try {
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+    const { productId } = req.body; // Mendapatkan ID produk dari body request
+    const { userId } = req.user; // Mendapatkan userId dari request yang sudah diautentikasi
 
-    let wishlist = await Wishlist.findOne({ user: userId });
-    console.log("Wishlist found:", wishlist);
+    // Mencari wishlist yang sudah ada untuk user ini
+    let wishlist = await Wishlist.findOne({ userId });
 
     if (!wishlist) {
-      wishlist = new Wishlist({ user: userId, products: [productId] });
+      // Jika wishlist belum ada, buat yang baru
+      wishlist = new Wishlist({ userId, products: [{ productId }] });
     } else {
-      if (!wishlist.products.includes(productId)) {
-        wishlist.products.push(productId);
-      } else {
-        return res.status(400).json({ message: "Product already in wishlist" });
+      // Pastikan productId adalah array yang valid
+      if (!wishlist.productId || !Array.isArray(wishlist.productId)) {
+        wishlist.productId = []; // Inisialisasi jika undefined atau bukan array
+      }
+
+      // Jika wishlist sudah ada, tambahkan produk baru jika belum ada
+      if (!wishlist.productId.some((id) => id.toString() === productId)) {
+        wishlist.productId.push(productId); // Tambahkan productId ke array
       }
     }
 
-    await wishlist.save();
-    res.status(200).json({ message: "Product added to wishlist", wishlist });
+    await wishlist.save(); // Simpan wishlist ke database
+    return res.status(200).json(wishlist);
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ message: "Error adding product to wishlist", error });
+    console.error("Error adding to wishlist:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.delete("/wishlist", authenticate, async (req, res) => {
+  try {
+    const { productId } = req.body; // Mendapatkan ID produk dari body request
+    const { userId } = req.user; // Mendapatkan userId dari request yang sudah diautentikasi
+
+    const wishlist = await Wishlist.findOne({ userId });
+
+    if (!wishlist) {
+      return res.status(404).json({ message: "Wishlist not found" });
+    }
+
+    // Hapus produk dari wishlist
+    wishlist.productId = wishlist.productId.filter(
+      (item) => item.productId.toString() !== productId
+    );
+    await wishlist.save();
+
+    return res.status(200).json(wishlist);
+  } catch (error) {
+    console.error("Error removing from wishlist:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 
 router.get("/wishlist", authenticate, async (req, res) => {
-  const userId = req.user.userId;
-
   try {
-    const wishlist = await Wishlist.findOne({ user: userId }).populate(
-      "products"
-    );
+    const { userId } = req.user;
+    const wishlist = await Wishlist.findOne({ userId })
+      .populate("productId")
+      .populate("userId");
 
     if (!wishlist) {
       return res.status(404).json({ message: "Wishlist not found" });
     }
 
-    res.status(200).json(wishlist);
+    return res.status(200).json(wishlist.productId);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving wishlist", error });
-  }
-});
-
-router.delete("/wishlist/remove", authenticate, async (req, res) => {
-  const { productId } = req.body;
-  const userId = req.user.userId;
-
-  if (!productId) {
-    return res.status(400).json({ message: "Product ID is required" });
-  }
-
-  if (!userId) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  try {
-    const wishlist = await Wishlist.findOne({ user: userId });
-
-    if (!wishlist) {
-      return res.status(404).json({ message: "Wishlist not found" });
-    }
-
-    const index = wishlist.products.indexOf(productId);
-    if (index > -1) {
-      wishlist.products.splice(index, 1);
-      await wishlist.save();
-      return res.status(200).json({ message: "Product removed from wistlist" });
-    } else {
-      return res.status(404).json({ message: "Product not found in wistlist" });
-    }
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error removing product from wishlist", error });
+    console.error("Error getting wishlist:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 

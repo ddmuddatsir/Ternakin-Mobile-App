@@ -27,15 +27,16 @@ import AddedValueCard from "../components/UI/AddedValueCard";
 import FarmCard from "../components/UI/FarmCard";
 import ConversationCard from "../components/UI/ConversationCard";
 import ProductShare from "../components/UI/ProductShare";
-import { BASE_URL } from "../api/config/apiConfig";
 import { useProductDetail } from "../hooks/useProductDetails";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axiosInstance from "../utils/axiosInstance";
+import { addToWishlist, removeFromWishlist } from "../redux/WishlistReducer";
 
 const DetailProductSelling = ({ route }) => {
   const { productId } = route.params;
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
+  const wishlist = useSelector((state) => state.wishlist.items);
   const authToken = useSelector((state) => state.auth.token);
   const navigation = useNavigation();
 
@@ -43,23 +44,15 @@ const DetailProductSelling = ({ route }) => {
   const [loading, setLoading] = useState(true);
   const [addedToCart, setAddedToCart] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
 
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
-        const response = await axiosInstance.get(
-          `${BASE_URL}/products/${productId}`
-        );
+        const response = await axiosInstance.get(`/products/${productId}`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
         setProduct(response.data);
-
-        const wishlistResponse = await axiosInstance.get(
-          `${BASE_URL}/wishlist`
-        );
-        const isProductInWishlist =
-          Array.isArray(wishlistResponse.data) &&
-          wishlistResponse.data.some((item) => item.productId === productId);
-        setIsWishlisted(isProductInWishlist);
       } catch (error) {
         console.error("Error fetching product details:", error);
       } finally {
@@ -67,12 +60,16 @@ const DetailProductSelling = ({ route }) => {
       }
     };
 
-    fetchProductDetail();
-  }, [productId]);
+    const fetchWishlistStatus = () => {
+      // Pastikan wishlist selalu terdefinisi dan merupakan array
+      const wishlistItems = wishlist || []; // Default ke array kosong jika wishlist undefined
+      const isInWishlist = wishlistItems.some((item) => item._id === productId);
+      setIsInWishlist(isInWishlist);
+    };
 
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
+    fetchProductDetail();
+    fetchWishlistStatus();
+  }, [productId, authToken, dispatch, wishlist]);
 
   if (!product) {
     return <Text>Product not found.</Text>;
@@ -96,7 +93,16 @@ const DetailProductSelling = ({ route }) => {
     }, 60000);
   };
 
-  // console.log(cart);
+  const handleAddToWishlist = () => {
+    if (isInWishlist) {
+      dispatch(removeFromWishlist(productId));
+    } else {
+      dispatch(addToWishlist(productId));
+    }
+    setIsInWishlist(!isInWishlist);
+  };
+
+  console.log(authToken);
 
   return (
     <>
@@ -232,19 +238,22 @@ const DetailProductSelling = ({ route }) => {
                 </View>
 
                 <Pressable
-                  // onPress={handleWishlistPress}
+                  onPress={handleAddToWishlist}
                   style={{ flexDirection: "row", gap: 6 }}
                 >
-                  {/* <Ionicons
-                    name={isWishlisted ? "heart" : "heart-outline"}
-                    size={24}
-                    color={isWishlisted ? "red" : GlobalStyles.colors.gray500}
-                  /> */}
                   <Ionicons
+                    name={isInWishlist ? "heart" : "heart-outline"}
+                    size={24}
+                    color={isInWishlist ? "red" : GlobalStyles.colors.gray500}
+                  />
+                  <Pressable onPressr={handleAddToWishlist}>
+                    <Text>Add to Wishlist</Text>
+                  </Pressable>
+                  {/* <Ionicons
                     name={"heart-outline"}
                     size={24}
                     color={GlobalStyles.colors.gray500}
-                  />
+                  /> */}
                   <Ionicons
                     name="share-social-outline"
                     size={24}

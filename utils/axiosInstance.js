@@ -1,11 +1,13 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { store } from "../store";
 import { logout, refreshToken } from "../redux/AuthReducer";
 import { BASE_URL } from "../api/config/apiConfig";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 axiosInstance.interceptors.request.use(
@@ -51,7 +53,7 @@ axiosInstance.interceptors.response.use(
         store.dispatch(logout());
       }
     }
-    return promise.reject(error);
+    return Promise.reject(error);
   }
 );
 

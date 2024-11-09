@@ -3,16 +3,19 @@ import mongoose from "mongoose";
 import User from "./user.js";
 import Product from "./product.js";
 
-const wishlistSchema = new mongoose.Schema(
+const Schema = mongoose.Schema;
+
+const wishlistSchema = new Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
+    userId: {
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    productId: [{ type: Schema.Types.ObjectId, ref: "Product" }],
   },
-  { timestamps: true }
+  { timestamps: true },
+  { collection: "swishlist" }
 );
 
 const Wishlist = mongoose.model("Wishlist", wishlistSchema);
