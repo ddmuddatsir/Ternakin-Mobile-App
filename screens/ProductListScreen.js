@@ -1,16 +1,21 @@
-import { Text, View, ScrollView, SafeAreaView } from "react-native";
-import { useState } from "react";
+import {
+  Text,
+  View,
+  ScrollView,
+  SafeAreaView,
+  TextInput,
+  Button,
+} from "react-native";
+import { useState, useEffect } from "react";
 import TagFilter from "../components/TagFIlter/TagFilter";
 import { GlobalStyles } from "../constants/style";
-import ProductCardSellingList from "../components/Product/ProductSelling/ProductCardSellingList";
+import FilterProductSelling from "../components/FilterProduct/FilterProductSelling";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axiosInstance from "../utils/axiosInstance";
+import { useDispatch, useSelector } from "react-redux";
+import { Picker } from "@react-native-picker/picker";
 
 const ProductListScreen = () => {
-  const [selectedFilter, setSelectedFilter] = useState([]);
-
-  const handleFilterChange = (newFilter) => {
-    setSelectedFilter(newFilter);
-  };
-
   return (
     <SafeAreaView
       style={{
@@ -34,10 +39,10 @@ const ProductListScreen = () => {
           backgroundColor: GlobalStyles.colors.light,
         }}
       >
-        <TagFilter
+        {/* <TagFilter
           selectedFilter={selectedFilter}
           onFilterChange={handleFilterChange}
-        />
+        /> */}
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -46,15 +51,7 @@ const ProductListScreen = () => {
         }}
       >
         <View style={{ flex: 1, paddingBottom: 68 }}>
-          <ProductCardSellingList />
-          <Text
-            style={{
-              marginTop: 20,
-              fontSize: 16,
-            }}
-          >
-            Filter yang dipilih: {selectedFilter.join(", ") || "Tidak ada"}
-          </Text>
+          <FilterProductSelling />
         </View>
       </ScrollView>
     </SafeAreaView>

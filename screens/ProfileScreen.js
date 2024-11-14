@@ -100,15 +100,7 @@ const ProfileScreen = () => {
             >
               {userData.name}
             </Text>
-            <Text
-              style={{
-                colors: GlobalStyles.colors.text700,
-                fontSize: 10,
-                fontWeight: "600",
-              }}
-            >
-              {userData.token}
-            </Text>
+
             <Text
               style={{
                 colors: GlobalStyles.colors.text700,

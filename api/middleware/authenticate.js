@@ -17,11 +17,11 @@ export const authenticate = async (req, res, next) => {
   const token = authHeader.split(" ")[1]; // Get token from 'Bearer token' format
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { userId: verified.userId }; // Attach user info to request object
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = { userId: decoded.userId }; // Attach user info to request object
 
     // Check if user exists
-    const user = await User.findById(verified.userId);
+    const user = await User.findById(decoded.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }

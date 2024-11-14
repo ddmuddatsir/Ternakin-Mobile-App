@@ -37,7 +37,7 @@ const DetailProductSelling = ({ route }) => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
   const wishlist = useSelector((state) => state.wishlist.items);
-  const authToken = useSelector((state) => state.auth.token);
+  // const authToken = useSelector((state) => state.auth.token);
   const navigation = useNavigation();
 
   const [product, setProduct] = useState(null);
@@ -46,13 +46,30 @@ const DetailProductSelling = ({ route }) => {
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isInWishlist, setIsInWishlist] = useState(false);
 
+  const getAuthToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (token) {
+        return token;
+      } else {
+        // Token tidak ditemukan, mungkin user belum login
+        throw new Error("Token not found");
+      }
+    } catch (err) {
+      console.error("Error fetching token:", err);
+      throw new Error("Error fetching token");
+    }
+  };
+
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
+        const token = await getAuthToken();
         const response = await axiosInstance.get(`/products/${productId}`, {
-          headers: { Authorization: `Bearer ${authToken}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setProduct(response.data);
+        console.log(token);
       } catch (error) {
         console.error("Error fetching product details:", error);
       } finally {
@@ -63,13 +80,17 @@ const DetailProductSelling = ({ route }) => {
     const fetchWishlistStatus = () => {
       // Pastikan wishlist selalu terdefinisi dan merupakan array
       const wishlistItems = wishlist || []; // Default ke array kosong jika wishlist undefined
-      const isInWishlist = wishlistItems.some((item) => item._id === productId);
-      setIsInWishlist(isInWishlist);
+      // const isInWishlist = wishlistItems.some((item) => item._id === productId);
+      const isProductInWishlist = wishlistItems.some(
+        (item) => item._id === productId
+      );
+
+      setIsInWishlist(isProductInWishlist);
     };
 
     fetchProductDetail();
     fetchWishlistStatus();
-  }, [productId, authToken, dispatch, wishlist]);
+  }, [productId, wishlist]);
 
   if (!product) {
     return <Text>Product not found.</Text>;
@@ -102,7 +123,7 @@ const DetailProductSelling = ({ route }) => {
     setIsInWishlist(!isInWishlist);
   };
 
-  console.log(authToken);
+  // console.log(token);
 
   return (
     <>
@@ -246,9 +267,7 @@ const DetailProductSelling = ({ route }) => {
                     size={24}
                     color={isInWishlist ? "red" : GlobalStyles.colors.gray500}
                   />
-                  <Pressable onPressr={handleAddToWishlist}>
-                    <Text>Add to Wishlist</Text>
-                  </Pressable>
+
                   {/* <Ionicons
                     name={"heart-outline"}
                     size={24}

@@ -2,6 +2,8 @@ import express from "express";
 import Wishlist from "../models/wishlist.js";
 import User from "../models/user.js";
 import Product from "../models/product.js";
+import Farm from "../models/farm.js";
+import ShippingMethod from "../models/shippingMethod.js";
 import { authenticate } from "../middleware/authenticate.js";
 
 const router = express.Router();
@@ -65,7 +67,19 @@ router.get("/wishlist", authenticate, async (req, res) => {
   try {
     const { userId } = req.user;
     const wishlist = await Wishlist.findOne({ userId })
-      .populate("productId")
+      .populate({
+        path: "productId",
+        populate: [
+          {
+            path: "shippingMethodId",
+            model: "ShippingMethod",
+          },
+          {
+            path: "farmId",
+            model: "Farm",
+          },
+        ],
+      })
       .populate("userId");
 
     if (!wishlist) {

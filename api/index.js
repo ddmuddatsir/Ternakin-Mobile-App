@@ -25,6 +25,7 @@ import paymentcreditcardRoutes from "./routes/payment.js";
 import wishlistRoutes from "./routes/wishlist.js";
 import { BASE_URL } from "./config/apiConfig.js";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ const port = 8000;
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Create a Nodemailer transporter
 // const transporter = nodemailer.createTransport({
@@ -175,7 +177,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/refresh-token", async (req, res) => {
-  const refreshToken = req.cookie.refreshToken;
+  const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
     return res.status(401).json({ message: "No refresh token provided." });

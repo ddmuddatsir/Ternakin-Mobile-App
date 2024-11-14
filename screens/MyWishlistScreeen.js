@@ -19,19 +19,46 @@ import {
   removeFromWishlist,
 } from "../redux/WishlistReducer";
 import { useDispatch, useSelector } from "react-redux";
+import ProductCardSelling from "../components/Product/ProductSelling/ProductCardSelling";
+import axiosInstance from "../utils/axiosInstance";
 
 const MyWishlistScreeen = () => {
   const dispatch = useDispatch();
   const wishlist = useSelector((state) => state.wishlist.items);
   const status = useSelector((state) => state.wishlist.status);
 
-  useEffect(() => {
-    dispatch(fetchWishlist());
-  }, [dispatch]);
-
-  const handleRemove = (productId) => {
-    dispatch(removeFromWishlist(productId));
+  const getAuthToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (token) {
+        return token;
+      } else {
+        // Token tidak ditemukan, mungkin user belum login
+        throw new Error("Token not found");
+      }
+    } catch (err) {
+      console.error("Error fetching token:", err);
+      throw new Error("Error fetching token");
+    }
   };
+
+  const fetchWishlistWithToken = async () => {
+    const token = await getAuthToken();
+    try {
+      const response = await axiosInstance.get(`/wishlist`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      dispatch(fetchWishlist(response.data)); // Update wishlist in Redux
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchWishlistWithToken();
+  }, [dispatch]);
 
   if (status === "loading") {
     return <Text>Loading...</Text>;
@@ -48,16 +75,33 @@ const MyWishlistScreeen = () => {
       >
         <HeaderBar back searcBar active={true} text={"Your Wishlist"} />
       </SafeAreaView>
-      <ScrollView>
-        <View>
-          <Text>Wishlist</Text>
-          {wishlist.map((item) => (
-            <View key={item._id}>
-              <Text>Wishlist ID: {item._id}</Text>
-              <Text>Wishlist ID: {item.title}</Text>
-              <Text>Wishlist ID: {item.productId}</Text>
-            </View>
-          ))}
+      <ScrollView
+        style={{
+          backgroundColor: GlobalStyles.colors.light,
+        }}
+      >
+        <Text>Wishlist</Text>
+
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            gap: 12,
+            paddingHorizontal: 10,
+            paddingVertical: 12,
+          }}
+        >
+          {wishlist.length > 0 ? (
+            wishlist.map((item) => (
+              <View key={item._id}>
+                <ProductCardSelling product={item} />
+              </View>
+            ))
+          ) : (
+            <Text>Wishlist</Text>
+          )}
         </View>
       </ScrollView>
     </>

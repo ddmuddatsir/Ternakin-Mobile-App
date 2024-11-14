@@ -2,14 +2,7 @@ import { ScrollView, Text, View } from "react-native";
 import TagFilterItem from "./TagFilterItem";
 import { GlobalStyles } from "../../constants/style";
 
-const filters = [
-  "Filter",
-  "Promo",
-  "Free Delivery",
-  "COD",
-  "Official Partner",
-  "Official tiga",
-];
+const filters = ["Filter", "Promo", "Free Delivery", "Termurah", "Berkualitas"];
 
 const TagFilter = ({ selectedFilter, onFilterChange }) => {
   const toggleSelection = (filter) => {
