@@ -52,7 +52,7 @@ export const CartSlice = createSlice({
       if (existingProduct) {
         existingProduct.quantity++;
       } else {
-        state.cart.push({ ...product, quantity: 1 });
+        state.cart.push({ ...product, productId: product._id, quantity: 1 });
       }
       state.total = calculateTotal(state.cart);
       state.discount = calculateDiscount(state.cart);

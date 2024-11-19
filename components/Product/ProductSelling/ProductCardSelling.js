@@ -125,7 +125,7 @@ const ProductCardSelling = ({ product, productFarmList }) => {
                 <Text
                   style={{ fontSize: 11, color: GlobalStyles.colors.text700 }}
                 >
-                  | Sold {product.sold.$numberInt}
+                  | Sold {product.sold}
                 </Text>
               </View>
               <Text

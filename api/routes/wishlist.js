@@ -52,11 +52,14 @@ router.delete("/wishlist", authenticate, async (req, res) => {
 
     // Hapus produk dari wishlist
     wishlist.productId = wishlist.productId.filter(
-      (item) => item.productId.toString() !== productId
+      (id) => id.toString() !== productId
     );
     await wishlist.save();
 
-    return res.status(200).json(wishlist);
+    return res.status(200).json({
+      message: "Product removed from wishlist",
+      products: wishlist.productId,
+    });
   } catch (error) {
     console.error("Error removing from wishlist:", error);
     return res.status(500).json({ message: "Internal server error" });

@@ -37,7 +37,6 @@ const DetailProductSelling = ({ route }) => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
   const wishlist = useSelector((state) => state.wishlist.items);
-  // const authToken = useSelector((state) => state.auth.token);
   const navigation = useNavigation();
 
   const [product, setProduct] = useState(null);

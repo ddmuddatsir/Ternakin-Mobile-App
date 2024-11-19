@@ -21,22 +21,30 @@ import { cleanCart, saveOrderToBackend } from "../redux/CartReducer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { BASE_URL } from "../api/config/apiConfig";
+import { createOrder } from "../redux/OrderReducer";
+import axiosInstance from "../utils/axiosInstance";
+import { useNavigation } from "@react-navigation/native";
 
 const protectionPrice = 50000;
 const serviceFee = 3000;
 const handleFee = 5000;
 
 const BuyConfirmationScreen = () => {
+  const navigation = useNavigation();
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
   const total = useSelector((state) => state.cart.total);
   const discount = useSelector((state) => state.cart.discount);
   const status = useSelector((state) => state.cart.status);
 
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [shippingMethodId, setShippingMethodId] = useState("");
+
   useEffect(() => {
     if (status === "succeeded") {
       sendEmail();
       Alert.alert("Orders Successfully", "Your orders on process");
+      dispatch(resetStatus());
     } else if (status === "failed") {
       Alert.alert(
         "Error",
@@ -70,24 +78,46 @@ const BuyConfirmationScreen = () => {
     serviceFee;
 
   const handleCheckout = async () => {
+    if (cart.length === 0) {
+      Alert.alert("Error", "Your cart is empty");
+      return;
+    }
+
+    const userId = await AsyncStorage.getItem("userId");
     const orderData = {
-      userId: await AsyncStorage.getItem("userId"),
-      products: cart.map(({ _id, quantity }) => ({ productId: _id, quantity })),
+      products: cart.map((item) => ({
+        userId,
+        productId: item.productId || item._id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
       totalAmount: totalPayment,
     };
-    dispatch(saveOrderToBackend(orderData));
+
+    console.log(
+      "Order Data Sent to Backend:",
+      JSON.stringify(orderData, null, 2)
+    ); // Log data order
+
+    dispatch(createOrder(orderData))
+      .unwrap()
+      .then(() => {
+        dispatch(cleanCart());
+        navigation.navigate("TransactionScreen");
+      })
+      .catch((error) => console.log(error));
     console.log(orderData);
   };
 
   const sendEmail = async () => {
+    const userEmail = await AsyncStorage.getItem("userEmail");
     const orderDetails = cart
       .map((item) => `${item.name} - ${item.quantity} x ${item.price}`)
       .join("\n");
 
     try {
-      await axios.post(`${BASE_URL}/send-email`, {
-        // email: await AsyncStorage.getItem("userEmail"),
-        email: "dedemudasir@gmail.com",
+      await axiosInstance.post(`${BASE_URL}/send-email`, {
+        email: userEmail, // Ambil email dari storage
         orderDetails,
       });
       console.log("Email sent successfully");

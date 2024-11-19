@@ -43,8 +43,8 @@ const MyWishlistScreeen = () => {
   };
 
   const fetchWishlistWithToken = async () => {
-    const token = await getAuthToken();
     try {
+      const token = await getAuthToken();
       const response = await axiosInstance.get(`/wishlist`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -53,6 +53,7 @@ const MyWishlistScreeen = () => {
       dispatch(fetchWishlist(response.data)); // Update wishlist in Redux
     } catch (error) {
       console.error("Error fetching wishlist:", error);
+      dispatch(fetchWishlist([]));
     }
   };
 
@@ -62,6 +63,10 @@ const MyWishlistScreeen = () => {
 
   if (status === "loading") {
     return <Text>Loading...</Text>;
+  }
+
+  if (status === "error") {
+    return <Text>Terjadi kesalahan saat memuat wishlist</Text>;
   }
 
   return (

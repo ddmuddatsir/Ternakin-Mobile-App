@@ -17,7 +17,9 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#D29852" }}>
       <HeaderBar searcBar active={false} text={"Red Cow"} />
-      <ScrollView style={{ backgroundColor: "white", flex: 1 }}>
+      <ScrollView
+        style={{ backgroundColor: GlobalStyles.colors.light, flex: 1 }}
+      >
         <PaymentBar style={{ flex: 1 }} />
         <FiturButtonService />
         <View style={{ paddingHorizontal: 10, paddingVertical: 12 }}>

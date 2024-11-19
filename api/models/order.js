@@ -13,6 +13,7 @@ const orderSchema = new Schema({
     {
       productId: {
         type: Schema.Types.ObjectId,
+
         ref: "Product",
         required: true,
       },
@@ -22,8 +23,8 @@ const orderSchema = new Schema({
   ],
   totalAmount: { type: Number, required: true }, // Menambahkan required
   orderDate: { type: Date, default: Date.now },
-  shippingAddress: { type: String, required: true }, // Menambahkan required
-  shippingMethodId: { type: Schema.Types.ObjectId, ref: "ShippingMethod" },
+  // shippingAddress: { type: String, required: true }, // Menambahkan required
+  // shippingMethodId: { type: Schema.Types.ObjectId, ref: "ShippingMethod" },
   status: {
     type: String,
     enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"],
