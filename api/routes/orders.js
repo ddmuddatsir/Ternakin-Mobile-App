@@ -36,13 +36,13 @@ router.post("/orders", authenticate, async (req, res) => {
       // shippingMethodId: req.body.shippingMethodId || null,
     });
 
-    console.log("Order data received:", {
-      userId,
-      products,
-      totalAmount,
-      // shippingAddress,
-      // shippingMethodId,
-    });
+    // console.log("Order data received:", {
+    //   userId,
+    //   products,
+    //   totalAmount,
+    //   // shippingAddress,
+    //   // shippingMethodId,
+    // });
 
     const saveOrder = await order.save();
     res.status(201).json(saveOrder);

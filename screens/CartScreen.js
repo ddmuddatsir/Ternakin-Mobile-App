@@ -1,3 +1,5 @@
+//Perbaiki: Belum connect ke backend
+
 import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { GlobalStyles } from "../constants/style";
 import HeaderBar from "../components/HeaderBar/HeaderBar";
@@ -10,7 +12,8 @@ import {
   decrementQuantity,
   incrementQuantity,
   cleanCart,
-  removeFromCart,
+  fetchCartFromBackend,
+  deleteAllCartItems,
 } from "../redux/CartReducer";
 import BottomTabButton from "../components/Button/BottomTabButton";
 import Button from "../components/Button/Button";
@@ -19,6 +22,8 @@ import ProductCardSellingList from "../components/Product/ProductSelling/Product
 import TitleForList from "../components/Title/TitleForList";
 import { useNavigation } from "@react-navigation/native";
 import AddressButton from "../components/Address/AddressButton";
+import { useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CartScreen = () => {
   const navigation = useNavigation();
@@ -26,6 +31,17 @@ const CartScreen = () => {
   const total = useSelector((state) => state.cart.total);
   const discount = useSelector((state) => state.cart.discount);
   const dispatch = useDispatch();
+  const userId = AsyncStorage.getItem("authToken");
+
+  useEffect(() => {
+    userId;
+    dispatch(fetchCartFromBackend(userId));
+  }, [dispatch]);
+
+  const handleRemoveAllItems = () => {
+    userId;
+    dispatch(deleteAllCartItems(userId));
+  };
 
   const handleIncrementQuantity = (product) => {
     dispatch(incrementQuantity({ _id: product._id }));
@@ -114,7 +130,10 @@ const CartScreen = () => {
                   </Text>
                 </View>
 
-                <Pressable onPress={() => dispatch(cleanCart())}>
+                <Pressable
+                  onPress={() => dispatch(cleanCart(handleRemoveAllItems))}
+                  // onPress={() => handleRemoveAllItems}
+                >
                   <Text
                     style={{
                       color: GlobalStyles.colors.gray100,

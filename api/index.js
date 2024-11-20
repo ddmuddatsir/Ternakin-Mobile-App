@@ -15,6 +15,7 @@ import Order from "./models/order.js";
 import { connectToDatabase } from "./config/db.js";
 
 import productRoutes from "./routes/products.js";
+import cartRoutes from "./routes/cartlist.js";
 import addressRoutes from "./routes/address.js";
 import ordersRoutes from "./routes/orders.js";
 import profileRoutes from "./routes/profile.js";
@@ -245,6 +246,7 @@ app.use(topupRoutes);
 app.use(paymentRoutes);
 app.use(paymentcreditcardRoutes);
 app.use(wishlistRoutes);
+app.use(cartRoutes);
 
 // Start server
 app.listen(port, () => {

@@ -98,15 +98,57 @@ const DetailProductSelling = ({ route }) => {
   const discountedPrice =
     product.price - (product.price * product.discPer) / 100;
 
+  // const addItemToCart = (product) => {
+  //   setAddedToCart(true);
+  //   dispatch(
+  //     addToCart({
+  //       ...product,
+  //       quantity: selectedQuantity,
+  //       totalAmount: discountedPrice * selectedQuantity,
+  //     })
+  //   );
+
+  //   setTimeout(() => {
+  //     setAddedToCart(false);
+  //   }, 60000);
+  // };
+
+  const saveCartToBackend = async (cartItem) => {
+    try {
+      const token = await getAuthToken();
+      const payload = {
+        items: [
+          {
+            productId: cartItem._id,
+            quantity: cartItem.quantity,
+          },
+        ],
+      };
+      console.log("Payload being sent to backend:", payload);
+
+      const response = await axiosInstance.post("/carts", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("Cart saved to backend:", response.data);
+    } catch (error) {
+      console.error(
+        "Error saving cart to backend:",
+        error.response?.data || error
+      );
+    }
+  };
+
   const addItemToCart = (product) => {
+    const cartItem = {
+      ...product,
+      quantity: selectedQuantity,
+      totalAmount: discountedPrice * selectedQuantity,
+    };
+
     setAddedToCart(true);
-    dispatch(
-      addToCart({
-        ...product,
-        quantity: selectedQuantity,
-        totalAmount: discountedPrice * selectedQuantity,
-      })
-    );
+    dispatch(addToCart(cartItem)); // Simpan ke Redux state
+    saveCartToBackend(cartItem); // Simpan ke database
 
     setTimeout(() => {
       setAddedToCart(false);
