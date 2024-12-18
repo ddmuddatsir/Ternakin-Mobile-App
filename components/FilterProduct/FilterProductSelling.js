@@ -13,6 +13,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import ProductCardSelling from "../Product/ProductSelling/ProductCardSelling";
 import { Picker } from "@react-native-picker/picker";
 import { GlobalStyles } from "../../constants/style";
+import { getAuthToken } from "../../utils/getAuthToken";
 
 const FilterProductSelling = () => {
   const [products, setProducts] = useState([]);
@@ -21,16 +22,6 @@ const FilterProductSelling = () => {
   const [maxPrice, setMaxPrice] = useState("");
   const [minRating, setMinRating] = useState("");
   const [selectedFilter, setSelectedFilter] = useState(null);
-
-  const getAuthToken = async () => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-      return token ? token : null;
-    } catch (err) {
-      console.error("Error fetching token:", err);
-      return null;
-    }
-  };
 
   const fetchProducts = async () => {
     try {

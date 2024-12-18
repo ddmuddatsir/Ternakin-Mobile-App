@@ -8,17 +8,14 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useState, useEffect, useContext } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
+import { useState, useEffect } from "react";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import { GlobalStyles } from "../constants/style";
 
 import MainLogo from "../assets/Logo.png";
-import { UserType } from "../UserContext";
-import { BASE_URL } from "../api/config/apiConfig";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/AuthReducer";
 import axiosInstance from "../utils/axiosInstance";

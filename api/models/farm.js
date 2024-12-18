@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 
 import Product from "./product.js";
+import ProductFund from "./funding/productFund.js";
+import SalesReportFarm from "./salesReportFarm.js";
 const Schema = mongoose.Schema;
 
 const farmSchema = new Schema(
@@ -11,7 +13,9 @@ const farmSchema = new Schema(
     followers: String,
     workingHours: String,
     image: String,
-    productId: [{ type: Schema.Types.ObjectId, ref: "Product" }], // Referensi ke model Product
+    salesReportFarmId: { type: Schema.Types.ObjectId, ref: "SalesReportFarm" },
+    productFundId: { type: Schema.Types.ObjectId, ref: "ProductFund" },
+    productId: [{ type: Schema.Types.ObjectId, ref: "Product" }],
   },
   { collection: "farm" }
 );

@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import SearchBar from "./SearchBar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { GlobalStyles } from "../../constants/style";

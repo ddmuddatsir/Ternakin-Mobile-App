@@ -57,7 +57,8 @@ router.get("/products", authenticate, async (req, res) => {
     const products = await Product.find(filter)
       .populate("farmId")
       .populate("shippingMethodId");
-    res.json(products);
+
+    res.status(200).json(products);
   } catch (error) {
     console.log("Error fetching error", error);
     res.status(500).json({ error: "There is an error" });
@@ -76,9 +77,30 @@ router.get("/products/:id", authenticate, async (req, res) => {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    res.json(product);
+    res.status(200).json(product);
   } catch (error) {
     console.error("Error fetching product", error);
+    res.status(500).json({ error: "There is an error" });
+  }
+});
+
+//search product by query
+router.get("/product/earch", authenticate, async (req, res) => {
+  const { q } = req.query;
+
+  try {
+    const regex = new RegExp(q, "i");
+    const products = await Product.find({ title: regex })
+      .populate("farmId")
+      .populate("shippingMethodId");
+
+    if (!products.length) {
+      return res.status(404).json({ error: "No products found" });
+    }
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products", error);
     res.status(500).json({ error: "There is an error" });
   }
 });

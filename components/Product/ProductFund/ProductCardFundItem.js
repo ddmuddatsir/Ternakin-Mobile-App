@@ -1,11 +1,24 @@
-import { Image, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 import Octicons from "@expo/vector-icons/Octicons";
 import { GlobalStyles } from "../../../constants/style";
+import { useNavigation } from "@react-navigation/native";
+import { currencyFormat } from "../../../utils/currencyFormat";
 
-const ProductCardService = () => {
+const ProductCardFundItem = ({ productFund }) => {
+  const navigation = useNavigation();
+
+  const fundingGoal = productFund.fundingGoal;
+  const profitSharing =
+    (productFund.fundingGoal / productFund.profitSharing) * 10;
+
+  const productFundHandlePressNavigation = () => {
+    navigation.navigate("", { productId: productFund._id });
+  };
+
   return (
     <>
-      <View
+      <Pressable
+        onPress={productFundHandlePressNavigation}
         style={{
           height: 210,
           width: 200,
@@ -22,15 +35,20 @@ const ProductCardService = () => {
         <View style={{ justifyContent: "center" }}>
           <View
             style={{
-              width: 200,
-              height: 72,
-              backgroundColor: "black",
               borderTopLeftRadius: 12,
               borderTopRightRadius: 12,
               marginBottom: 8,
             }}
           >
-            <Image />
+            <Image
+              source={{ uri: productFund.images[0] }}
+              style={{
+                width: 200,
+                height: 72,
+                borderTopLeftRadius: 12,
+                borderTopRightRadius: 12,
+              }}
+            />
           </View>
           <View
             style={{
@@ -51,6 +69,7 @@ const ProductCardService = () => {
               }}
             >
               <Image
+                source={{ uri: productFund.farmId.image }}
                 style={{
                   width: 32,
                   height: 32,
@@ -58,6 +77,7 @@ const ProductCardService = () => {
                   borderRadius: 24,
                 }}
               />
+
               <View style={{ gap: 4 }}>
                 <Text
                   style={{
@@ -66,12 +86,12 @@ const ProductCardService = () => {
                     color: GlobalStyles.colors.text700,
                   }}
                 >
-                  UG Farm
+                  {productFund.farmId.name}
                 </Text>
                 <Text
                   style={{ fontSize: 10, color: GlobalStyles.colors.text100 }}
                 >
-                  Cigombong, Kab. Bogor
+                  {productFund.farmId.location}
                 </Text>
               </View>
             </View>
@@ -94,12 +114,12 @@ const ProductCardService = () => {
                 <Text
                   style={{ fontSize: 11, color: GlobalStyles.colors.text100 }}
                 >
-                  5.0 Trust
+                  {productFund.farmId.rating} Trust
                 </Text>
                 <Text
                   style={{ fontSize: 11, color: GlobalStyles.colors.text700 }}
                 >
-                  | 42K Followers
+                  | {productFund.farmId.followers} Followers
                 </Text>
               </View>
             </View>
@@ -122,7 +142,7 @@ const ProductCardService = () => {
                     color: GlobalStyles.colors.primary,
                   }}
                 >
-                  Rp 12.000.000
+                  Rp{currencyFormat(fundingGoal)}
                 </Text>
               </View>
               <View style={{ gap: 4, width: 100 }}>
@@ -138,15 +158,16 @@ const ProductCardService = () => {
                     color: GlobalStyles.colors.primary,
                   }}
                 >
-                  Rp 5.000.000
+                  Rp
+                  {currencyFormat(profitSharing)}
                 </Text>
               </View>
             </View>
           </View>
         </View>
-      </View>
+      </Pressable>
     </>
   );
 };
 
-export default ProductCardService;
+export default ProductCardFundItem;

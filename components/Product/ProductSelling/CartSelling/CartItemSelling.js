@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View, Image } from "react-native";
 import { GlobalStyles } from "../../../../constants/style";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { currencyFormat } from "../../../../utils/currencyFormat";
 
 const CartItemSelling = ({
   product,
@@ -111,7 +112,7 @@ const CartItemSelling = ({
                   color: GlobalStyles.colors.text700,
                 }}
               >
-                Rp{discountPrice}
+                Rp{currencyFormat(discountPrice)}
               </Text>
 
               <Text
@@ -120,7 +121,7 @@ const CartItemSelling = ({
                   color: GlobalStyles.colors.gray100,
                 }}
               >
-                Rp{product.price}
+                Rp{currencyFormat(product.price)}
               </Text>
             </View>
           </View>

@@ -14,13 +14,11 @@ const TabTop = () => {
       <SafeAreaView
         style={{
           backgroundColor: GlobalStyles.colors.light,
-          paddingHorizontal: 10,
           paddingBottom: -30,
         }}
       >
         <View
           style={{
-            paddingTop: 10,
             flexDirection: "row",
             alignItems: "center",
           }}

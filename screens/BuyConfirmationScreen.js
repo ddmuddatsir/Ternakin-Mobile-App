@@ -6,11 +6,10 @@ import {
   Pressable,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { GlobalStyles } from "../constants/style";
 import HeaderBar from "../components/HeaderBar/HeaderBar";
 import BottomTabButton from "../components/Button/BottomTabButton";
@@ -21,11 +20,11 @@ import { useDispatch, useSelector } from "react-redux";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { cleanCart, saveOrderToBackend } from "../redux/CartReducer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import { BASE_URL } from "../api/config/apiConfig";
 import { createOrder } from "../redux/OrderReducer";
 import axiosInstance from "../utils/axiosInstance";
 import { useNavigation } from "@react-navigation/native";
+import { currencyFormat } from "../utils/currencyFormat";
 
 const protectionPrice = 50000;
 const serviceFee = 3000;
@@ -38,9 +37,6 @@ const BuyConfirmationScreen = () => {
   const total = useSelector((state) => state.cart.total);
   const discount = useSelector((state) => state.cart.discount);
   const status = useSelector((state) => state.cart.status);
-
-  const [shippingAddress, setShippingAddress] = useState("");
-  const [shippingMethodId, setShippingMethodId] = useState("");
 
   useEffect(() => {
     if (status === "succeeded") {
@@ -225,7 +221,10 @@ const BuyConfirmationScreen = () => {
                             fontWeight: "600",
                           }}
                         >
-                          Rp{item.price - (item.price * item.discPer) / 100}
+                          Rp
+                          {currencyFormat(
+                            item.price - (item.price * item.discPer) / 100
+                          )}
                         </Text>
                         <Text
                           style={{
@@ -290,7 +289,7 @@ const BuyConfirmationScreen = () => {
                           fontWeight: "500",
                         }}
                       >
-                        Rp{protectionPrice}
+                        Rp{currencyFormat(protectionPrice)}
                       </Text>
                     </View>
                     <ShippingCardModal
@@ -448,7 +447,7 @@ const BuyConfirmationScreen = () => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{shippingSubTotalsPrice}
+                    Rp{currencyFormat(shippingSubTotalsPrice)}
                   </Text>
                   <Text
                     style={{
@@ -456,7 +455,7 @@ const BuyConfirmationScreen = () => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{totalProtectionPrice}
+                    Rp{currencyFormat(totalProtectionPrice)}
                   </Text>
                   <Text
                     style={{

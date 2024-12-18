@@ -1,5 +1,6 @@
 import { Button, Image, Pressable, Text, View } from "react-native";
 import { GlobalStyles } from "../../constants/style";
+import { currencyFormat } from "../../utils/currencyFormat";
 
 const TransactiionCardItem = ({ product }) => {
   return (
@@ -68,7 +69,7 @@ const TransactiionCardItem = ({ product }) => {
                 fontWeight: "bold",
               }}
             >
-              Rp{product.price}
+              Rp{currencyFormat(product.price)}
             </Text>
           </View>
         </View>

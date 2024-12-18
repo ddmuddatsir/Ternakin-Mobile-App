@@ -1,13 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { setOrderDetails, setCheckoutSuccess } from "./checkoutSlice";
-import axios from "axios";
-import { BASE_URL } from "../api/config/apiConfig";
+import axiosInstance from "../utils/axiosInstance";
 
 export const fetchCartFromBackend = createAsyncThunk(
   "cart/fetchCartFromBackend",
   async (userId) => {
     const token = await getAuthToken(); // Pastikan Anda memiliki fungsi ini
-    const response = await axios.get(`${BASE_URL}/carts/${userId}`, {
+    const response = await axiosInstance.get(`/carts/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
@@ -18,8 +17,8 @@ export const deleteCartItem = createAsyncThunk(
   "cart/deleteCartItem",
   async ({ userId, productId }) => {
     const token = await getAuthToken(); // Pastikan Anda memiliki fungsi ini
-    const response = await axios.delete(
-      `${BASE_URL}/carts/${userId}/${productId}`,
+    const response = await axiosInstance.delete(
+      `/carts/${userId}/${productId}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -32,7 +31,7 @@ export const deleteAllCartItems = createAsyncThunk(
   "cart/deleteAllCartItems",
   async (userId) => {
     const token = await getAuthToken(); // Pastikan Anda memiliki fungsi ini
-    const response = await axios.delete(`${BASE_URL}/carts/${userId}`, {
+    const response = await axiosInstance.delete(`/carts/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
@@ -43,8 +42,8 @@ export const updateCartItemQuantity = createAsyncThunk(
   "cart/updateCartItemQuantity",
   async ({ userId, productId, quantity }) => {
     const token = await getAuthToken(); // Pastikan Anda memiliki fungsi ini
-    const response = await axios.put(
-      `${BASE_URL}/carts/${userId}/${productId}`,
+    const response = await axiosInstance.put(
+      `/carts/${userId}/${productId}`,
       { quantity },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -78,7 +77,7 @@ const calculateDiscount = (cart) => {
 // export const saveOrderToBackend = createAsyncThunk(
 //   "cart/saveOrderToBackend",
 //   async (orderData) => {
-//     const response = await axios.post(`${BASE_URL}/orders`, orderData);
+//     const response = await axiosInstance.post(`/orders`, orderData);
 //     return response.data;
 //   }
 // );

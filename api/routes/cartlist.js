@@ -12,6 +12,7 @@ router.post("/carts", authenticate, async (req, res) => {
     const { userId } = req.user;
 
     let cart = await Cart.findOne({ userId });
+
     if (!cart) {
       cart = new Cart({ userId, items });
     } else {
@@ -19,6 +20,7 @@ router.post("/carts", authenticate, async (req, res) => {
         const existingItem = cart.items.find(
           (cartItem) => cartItem.productId.toString() === item.ProductId
         );
+
         if (existingItem) {
           existingItem.quantity += item.quantity;
         } else {

@@ -7,54 +7,23 @@ import {
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import ProductCardSelling from "./ProductCardSelling";
-import { BASE_URL } from "../../../api/config/apiConfig";
-import { useDispatch, useSelector } from "react-redux";
-import axiosInstance from "../../../utils/axiosInstance";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import ButtonFilterProductSelling from "../../FilterProduct/ButtonFilterProductSelling";
+import { fetchData } from "../../../utils/fetchData";
 
 const ProductCardSellingList = ({ filter }) => {
-  const dispatch = useDispatch();
   const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState(null);
-  const [category, setCategory] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [minRating, setMinRating] = useState("");
-
-  const getAuthToken = async () => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-      if (token) {
-        return token;
-      }
-    } catch (err) {
-      console.error("Error fetching token:", err);
-    }
-  };
 
   useEffect(() => {
-    fetchProducts();
+    fetchDataProducts();
   }, []);
 
-  const fetchProducts = async (filterType) => {
-    try {
-      setLoading(true);
-      // setError(null);
-      const queryParams = {};
+  const fetchDataProducts = async (filterType) => {
+    setLoading(true);
+    const data = await fetchData(`/products`);
 
-      const token = await getAuthToken();
-      const response = token
-        ? await axiosInstance.get(`/products`, {
-            headers: { Authorization: `Bearer ${token}` },
-            params: queryParams,
-          })
-        : await axiosInstance.get(`/products`, {
-            params: queryParams,
-          });
-
-      let fetchedProducts = response.data;
+    if (data) {
+      let fetchedProducts = data;
 
       if (filterType === "priceLowToHigh") {
         fetchedProducts = fetchedProducts.sort(
@@ -75,27 +44,21 @@ const ProductCardSellingList = ({ filter }) => {
       }
 
       setProduct(fetchedProducts);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      // setError("Failed to load products. Please try again later.");
-    } finally {
-      setLoading(false);
+    } else {
+      console.error("Failed to load products data", error);
     }
+    setLoading(false);
   };
 
   if (loading) {
     return <Text>Loading...</Text>;
   }
 
-  // if (error) {
-  //   return <Text>{error}</Text>;
-  // }
-
   return (
     <>
       {filter && (
         <SafeAreaView>
-          <ButtonFilterProductSelling onFilterChange={fetchProducts} />
+          <ButtonFilterProductSelling onFilterChange={fetchDataProducts} />
         </SafeAreaView>
       )}
       {loading ? (

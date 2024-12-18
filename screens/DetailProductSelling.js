@@ -6,31 +6,28 @@ import {
   ScrollView,
   Image,
   Pressable,
-  Alert,
 } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import HeaderBar from "../components/HeaderBar/HeaderBar";
 import { GlobalStyles } from "../constants/style";
 import Octicons from "@expo/vector-icons/Octicons";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import TitleForList from "../components/Title/TitleForList";
 import ProductCardSellingList from "../components/Product/ProductSelling/ProductCardSellingList";
 import { useDispatch, useSelector } from "react-redux";
-import { addOrder, addToCart } from "../redux/CartReducer";
+import { addToCart } from "../redux/CartReducer";
 import ShippingCardModal from "../components/Modal/ShippingCardModal";
 import DetailProductSellingDescription from "../components/Description/DetailProductSellingDescription";
 import BottomTabButton from "../components/Button/BottomTabButton";
 import Button from "../components/Button/Button";
-import axios from "axios";
 import AddedValueCard from "../components/UI/AddedValueCard";
 import FarmCard from "../components/UI/FarmCard";
 import ConversationCard from "../components/UI/ConversationCard";
-import ProductShare from "../components/UI/ProductShare";
-import { useProductDetail } from "../hooks/useProductDetails";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import axiosInstance from "../utils/axiosInstance";
 import { addToWishlist, removeFromWishlist } from "../redux/WishlistReducer";
+import { getAuthToken } from "../utils/getAuthToken";
+import { currencyFormat } from "../utils/currencyFormat";
+import { fetchData } from "../utils/fetchData";
 
 const DetailProductSelling = ({ route }) => {
   const { productId } = route.params;
@@ -41,41 +38,11 @@ const DetailProductSelling = ({ route }) => {
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [addedToCart, setAddedToCart] = useState(false);
+  const [setAddedToCart] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [isInWishlist, setIsInWishlist] = useState(false);
 
-  const getAuthToken = async () => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-      if (token) {
-        return token;
-      } else {
-        // Token tidak ditemukan, mungkin user belum login
-        throw new Error("Token not found");
-      }
-    } catch (err) {
-      console.error("Error fetching token:", err);
-      throw new Error("Error fetching token");
-    }
-  };
-
   useEffect(() => {
-    const fetchProductDetail = async () => {
-      try {
-        const token = await getAuthToken();
-        const response = await axiosInstance.get(`/products/${productId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProduct(response.data);
-        console.log(token);
-      } catch (error) {
-        console.error("Error fetching product details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     const fetchWishlistStatus = () => {
       // Pastikan wishlist selalu terdefinisi dan merupakan array
       const wishlistItems = wishlist || []; // Default ke array kosong jika wishlist undefined
@@ -87,9 +54,22 @@ const DetailProductSelling = ({ route }) => {
       setIsInWishlist(isProductInWishlist);
     };
 
-    fetchProductDetail();
+    fetchDataProductDetail();
     fetchWishlistStatus();
   }, [productId, wishlist]);
+
+  const fetchDataProductDetail = async () => {
+    setLoading(true);
+    const data = await fetchData(`/products/${productId}`);
+
+    if (data) {
+      setProduct(data);
+    } else {
+      console.error("Failed to load Product detail");
+    }
+
+    setLoading(false);
+  };
 
   if (!product) {
     return <Text>Product not found.</Text>;
@@ -97,21 +77,6 @@ const DetailProductSelling = ({ route }) => {
 
   const discountedPrice =
     product.price - (product.price * product.discPer) / 100;
-
-  // const addItemToCart = (product) => {
-  //   setAddedToCart(true);
-  //   dispatch(
-  //     addToCart({
-  //       ...product,
-  //       quantity: selectedQuantity,
-  //       totalAmount: discountedPrice * selectedQuantity,
-  //     })
-  //   );
-
-  //   setTimeout(() => {
-  //     setAddedToCart(false);
-  //   }, 60000);
-  // };
 
   const saveCartToBackend = async (cartItem) => {
     try {
@@ -163,8 +128,6 @@ const DetailProductSelling = ({ route }) => {
     }
     setIsInWishlist(!isInWishlist);
   };
-
-  // console.log(token);
 
   return (
     <>
@@ -238,7 +201,7 @@ const DetailProductSelling = ({ route }) => {
                   color: GlobalStyles.colors.text700,
                 }}
               >
-                Rp{discountedPrice}
+                Rp{currencyFormat(discountedPrice)}
               </Text>
               <View
                 style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
@@ -268,7 +231,7 @@ const DetailProductSelling = ({ route }) => {
                     textDecorationLine: "line-through",
                   }}
                 >
-                  Rp{product.price}
+                  Rp{currencyFormat(product.price)}
                 </Text>
               </View>
               <View

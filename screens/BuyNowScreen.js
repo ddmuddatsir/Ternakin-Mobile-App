@@ -1,9 +1,9 @@
 import {
+  Alert,
   Image,
   Pressable,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
@@ -17,6 +17,11 @@ import AddressCard from "../components/Address/AddressCard";
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Cart from "../api/models/cartlist";
+import axiosInstance from "../utils/axiosInstance";
+import { BASE_URL } from "../api/config/apiConfig";
+import { currencyFormat } from "../utils/currencyFormat";
 
 const protectionPrice = 50000;
 const serviceFee = 3000;
@@ -26,6 +31,8 @@ const BuyNowScreen = ({ route }) => {
   const { product } = route.params;
   const dispatch = useDispatch();
   const navigation = useNavigation();
+
+  const [loading, setLoading] = useState(false);
 
   const discountPrice = product.price - (product.price * product.discPer) / 100;
 
@@ -39,6 +46,30 @@ const BuyNowScreen = ({ route }) => {
   if (!product.quantity) {
     product.quantity = 1;
   }
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      const orderData = {
+        userId,
+        products: [
+          { productId: product._id, quantity: 1, price: product.price },
+        ],
+        totalAmount: totalPayment,
+      };
+
+      await axiosInstance.post(`${BASE_URL}/orders`, orderData);
+
+      Alert.alert("Success", "Your order has been placed!");
+      navigation.navigate("TransactionScreen");
+    } catch (error) {
+      console.error("Checkout Error:", error.message);
+      Alert.alert("Error", "Failed to place order. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -129,7 +160,7 @@ const BuyNowScreen = ({ route }) => {
                         }}
                       >
                         Rp
-                        {discountPrice}
+                        {currencyFormat(discountPrice)}
                       </Text>
                       <Text
                         style={{
@@ -194,7 +225,7 @@ const BuyNowScreen = ({ route }) => {
                         fontWeight: "500",
                       }}
                     >
-                      Rp{protectionPrice}
+                      Rp{currencyFormat(protectionPrice)}
                     </Text>
                   </View>
                   <ShippingCardModal
@@ -235,7 +266,7 @@ const BuyNowScreen = ({ route }) => {
                   }}
                 >
                   Rp
-                  {discountPrice}
+                  {currencyFormat(discountPrice)}
                 </Text>
               </View>
             </View>
@@ -344,7 +375,7 @@ const BuyNowScreen = ({ route }) => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{discountPrice}
+                    Rp{currencyFormat(discountPrice)}
                   </Text>
                   <Text
                     style={{
@@ -360,7 +391,7 @@ const BuyNowScreen = ({ route }) => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{protectionPrice}
+                    Rp{currencyFormat(protectionPrice)}
                   </Text>
                   <Text
                     style={{
@@ -440,7 +471,7 @@ const BuyNowScreen = ({ route }) => {
         </Pressable>
 
         <Button
-          // onPress={() => addItemToproduct(route?.params?.product)}
+          onPress={handleCheckout}
           text="Pay Out"
           color="secondary"
           styles={{
@@ -453,29 +484,3 @@ const BuyNowScreen = ({ route }) => {
 };
 
 export default BuyNowScreen;
-
-// const styles = StyleSheet.create({});
-
-// import React from "react";
-// import { View, Text, Button } from "react-native";
-// import { useRoute } from "@react-navigation/native";
-
-// const BuyNowScreen = () => {
-//   const route = useRoute();
-//   const { product } = route.params;
-
-//   return (
-//     <View style={{ padding: 20 }}>
-//       <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-//         Konfirmasi Pembelian
-//       </Text>
-//       <Text style={{ marginVertical: 20 }}>Anda akan membeli:</Text>
-//       <Text style={{ fontSize: 18 }}>{product.title}</Text>
-//       <Text style={{ fontSize: 18 }}>Harga: Rp{product.price}</Text>
-//       <Button title="Kembali" onPress={() => navigation.goBack()} />
-//       {/* Tambahkan informasi lain yang diperlukan di sini */}
-//     </View>
-//   );
-// };
-
-// export default BuyNowScreen;

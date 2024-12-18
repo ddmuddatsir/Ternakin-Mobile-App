@@ -2,17 +2,19 @@ import mongoose from "mongoose";
 import Product from "./product.js";
 import User from "./user.js";
 
-const cartlistSchema = new mongoose.Schema(
+const Schema = mongoose.Schema;
+
+const cartlistSchema = new Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
     items: [
       {
         productId: {
-          type: mongoose.Schema.Types.ObjectId,
+          type: Schema.Types.ObjectId,
           ref: "Prodcut",
           required: true,
         },

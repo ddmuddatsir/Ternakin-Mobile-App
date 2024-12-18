@@ -24,7 +24,7 @@ const Button = ({ text, color, styles, children, onPress }) => {
         {
           backgroundColor: backgroundColorFill,
           borderRadius: 12,
-          borderWidth: color === "off" ?? 1.6,
+          borderWidth: color === "off" ? 1.6 : "",
           borderColor: color === "off" ? GlobalStyles.colors.primary100 : "",
           justifyContent: "center",
           alignItems: "center",

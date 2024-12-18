@@ -2,7 +2,6 @@
 
 import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { GlobalStyles } from "../constants/style";
-import HeaderBar from "../components/HeaderBar/HeaderBar";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -31,16 +30,13 @@ const CartScreen = () => {
   const total = useSelector((state) => state.cart.total);
   const discount = useSelector((state) => state.cart.discount);
   const dispatch = useDispatch();
-  const userId = AsyncStorage.getItem("authToken");
 
   useEffect(() => {
-    userId;
-    dispatch(fetchCartFromBackend(userId));
+    dispatch(fetchCartFromBackend());
   }, [dispatch]);
 
   const handleRemoveAllItems = () => {
-    userId;
-    dispatch(deleteAllCartItems(userId));
+    dispatch(deleteAllCartItems());
   };
 
   const handleIncrementQuantity = (product) => {
@@ -73,34 +69,35 @@ const CartScreen = () => {
       <SafeAreaView
         style={{
           justifyContent: "center",
-          alignItems: "center",
+
           backgroundColor: GlobalStyles.colors.light,
         }}
       >
-        <HeaderBar withouttIcon wishlist back active={true} text={"Cart"} />
+        <View
+          style={{
+            flexDirection: "row",
+            paddingHorizontal: 2,
+            marginHorizontal: 12,
+            marginVertical: 8,
+            gap: 4,
+            backgroundColor: GlobalStyles.colors.light,
+          }}
+        >
+          <Ionicons
+            name="location-outline"
+            size={16}
+            color={GlobalStyles.colors.gray500}
+          />
+          <AddressButton />
+          <MaterialIcons
+            name="keyboard-arrow-down"
+            size={18}
+            color={GlobalStyles.colors.gray500}
+          />
+        </View>
       </SafeAreaView>
       <ScrollView style={{ backgroundColor: GlobalStyles.colors.light }}>
         <View style={{ padding: 10, gap: 16 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              paddingHorizontal: 2,
-              flex: 1,
-              gap: 4,
-            }}
-          >
-            <Ionicons
-              name="location-outline"
-              size={16}
-              color={GlobalStyles.colors.gray500}
-            />
-            <AddressButton />
-            <MaterialIcons
-              name="keyboard-arrow-down"
-              size={18}
-              color={GlobalStyles.colors.gray500}
-            />
-          </View>
           <View style={{ flex: 1, gap: 12, justifyContent: "center" }}>
             {hasProduct ? (
               <View
@@ -112,7 +109,8 @@ const CartScreen = () => {
                   paddingRight: 6,
                 }}
               >
-                <View
+                {/* Button Checklist all */}
+                <Pressable
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
@@ -128,8 +126,9 @@ const CartScreen = () => {
                   <Text style={{ color: GlobalStyles.colors.text700 }}>
                     Check All
                   </Text>
-                </View>
+                </Pressable>
 
+                {/* Button delete all */}
                 <Pressable
                   onPress={() => dispatch(cleanCart(handleRemoveAllItems))}
                   // onPress={() => handleRemoveAllItems}

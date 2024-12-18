@@ -16,6 +16,7 @@ import { connectToDatabase } from "./config/db.js";
 
 import productRoutes from "./routes/products.js";
 import cartRoutes from "./routes/cartlist.js";
+import farmRoutes from "./routes/farm.js";
 import addressRoutes from "./routes/address.js";
 import ordersRoutes from "./routes/orders.js";
 import profileRoutes from "./routes/profile.js";
@@ -23,7 +24,12 @@ import walletRoutes from "./routes/wallet.js";
 import topupRoutes from "./routes/topup.js";
 import paymentRoutes from "./routes/payment.js";
 import paymentcreditcardRoutes from "./routes/payment.js";
+import productCourseRoutes from "./routes/course/productCourses.js";
+import cartCourseRoutes from "./routes/course/cartCourses.js";
+import orderCourseRoutes from "./routes/course/orderCourses.js";
+import wishlistCourseRoutes from "./routes/course/wishlistCourses.js";
 import wishlistRoutes from "./routes/wishlist.js";
+import productFundRoutes from "./routes/funding/productFunds.js";
 import { BASE_URL } from "./config/apiConfig.js";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -237,16 +243,29 @@ app.post("/send-email", async (req, res) => {
   }
 });
 
-app.use(productRoutes);
-app.use(addressRoutes);
-app.use(ordersRoutes);
+//user profile router
 app.use(profileRoutes);
+app.use(addressRoutes);
 app.use(walletRoutes);
 app.use(topupRoutes);
 app.use(paymentRoutes);
 app.use(paymentcreditcardRoutes);
+
+//e-commerce router
+app.use(productRoutes);
+app.use(ordersRoutes);
 app.use(wishlistRoutes);
 app.use(cartRoutes);
+app.use(farmRoutes);
+
+//course router
+app.use(productCourseRoutes);
+app.use(cartCourseRoutes);
+app.use(orderCourseRoutes);
+app.use(wishlistCourseRoutes);
+
+//fund router
+app.use(productFundRoutes);
 
 // Start server
 app.listen(port, () => {

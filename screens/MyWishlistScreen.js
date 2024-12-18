@@ -1,67 +1,36 @@
-import {
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  Button,
-} from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { GlobalStyles } from "../constants/style";
 import HeaderBar from "../components/HeaderBar/HeaderBar";
-import axios from "axios";
-import { BASE_URL } from "../api/config/apiConfig";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  addToWishlist,
-  fetchWishlist,
-  removeFromWishlist,
-} from "../redux/WishlistReducer";
+
+import { fetchWishlist } from "../redux/WishlistReducer";
 import { useDispatch, useSelector } from "react-redux";
 import ProductCardSelling from "../components/Product/ProductSelling/ProductCardSelling";
-import axiosInstance from "../utils/axiosInstance";
+import { fetchData } from "../utils/fetchData";
 
-const MyWishlistScreeen = () => {
+const MyWishlistScreen = () => {
   const dispatch = useDispatch();
   const wishlist = useSelector((state) => state.wishlist.items);
   const status = useSelector((state) => state.wishlist.status);
+  const [loading, setLoading] = useState(true);
 
-  const getAuthToken = async () => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-      if (token) {
-        return token;
-      } else {
-        // Token tidak ditemukan, mungkin user belum login
-        throw new Error("Token not found");
-      }
-    } catch (err) {
-      console.error("Error fetching token:", err);
-      throw new Error("Error fetching token");
-    }
-  };
+  useEffect(() => {
+    fetchDataWishlist();
+  }, [dispatch]);
 
-  const fetchWishlistWithToken = async () => {
-    try {
-      const token = await getAuthToken();
-      const response = await axiosInstance.get(`/wishlist`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      dispatch(fetchWishlist(response.data)); // Update wishlist in Redux
-    } catch (error) {
-      console.error("Error fetching wishlist:", error);
+  const fetchDataWishlist = async () => {
+    setLoading(true);
+    const data = await fetchData(`/wishlist`);
+
+    if (data) {
+      dispatch(fetchWishlist(data));
+    } else {
+      console.error("Failed to load Wishlist data");
       dispatch(fetchWishlist([]));
     }
   };
 
-  useEffect(() => {
-    fetchWishlistWithToken();
-  }, [dispatch]);
-
-  if (status === "loading") {
+  if (status === "loading" || loading) {
     return <Text>Loading...</Text>;
   }
 
@@ -113,6 +82,6 @@ const MyWishlistScreeen = () => {
   );
 };
 
-export default MyWishlistScreeen;
+export default MyWishlistScreen;
 
 const styles = StyleSheet.create({});

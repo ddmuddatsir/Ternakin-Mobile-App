@@ -2,6 +2,7 @@ import { Image, Pressable, Text, View } from "react-native";
 import { GlobalStyles } from "../../../constants/style";
 import Octicons from "@expo/vector-icons/Octicons";
 import { useNavigation } from "@react-navigation/native";
+import { currencyFormat } from "../../../utils/currencyFormat";
 
 const ProductCardSelling = ({ product, productFarmList }) => {
   const navigation = useNavigation();
@@ -40,6 +41,7 @@ const ProductCardSelling = ({ product, productFarmList }) => {
             shadowRadius: 4,
             borderColor: GlobalStyles.colors.store_line,
             borderWidth: 0.25,
+            paddingBottom: 8,
           }}
         >
           <View style={{ height: 300, width: 190, justifyContent: "center" }}>
@@ -82,7 +84,7 @@ const ProductCardSelling = ({ product, productFarmList }) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Rp{discountedPrice}
+                    Rp{currencyFormat(discountedPrice)}
                   </Text>
 
                   <View
@@ -99,7 +101,7 @@ const ProductCardSelling = ({ product, productFarmList }) => {
                         textDecorationLine: "line-through",
                       }}
                     >
-                      Rp{product.price}
+                      Rp{currencyFormat(product.price)}
                     </Text>
                   </View>
                 </View>
@@ -156,7 +158,7 @@ const ProductCardSelling = ({ product, productFarmList }) => {
                 fontWeight: "bold",
               }}
             >
-              Rp{discountedPrice}
+              Rp{currencyFormat(discountedPrice)}
             </Text>
           </View>
         </Pressable>

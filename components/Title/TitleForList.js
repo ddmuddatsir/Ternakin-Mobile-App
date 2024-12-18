@@ -23,6 +23,7 @@ const TitleForList = ({ text, navigate }) => {
       </Text>
       {navigate && (
         <Pressable
+          onPress={navigate}
           style={{
             flexDirection: "row",
             justifyContent: "center",
