@@ -5,6 +5,7 @@ export const connectToDatabase = async () => {
   try {
     await mongoose.connect(
       "mongodb+srv://dedemudasir:dedemudasir@productcard.ahdtnni.mongodb.net/register"
+      // "mongodb://dedemudasir:dedemudasir@ac-6zskjgj-shard-00-00.ahdtnni.mongodb.net:27017,ac-6zskjgj-shard-00-01.ahdtnni.mongodb.net:27017,ac-6zskjgj-shard-00-02.ahdtnni.mongodb.net:27017/?ssl=true&replicaSet=atlas-2zanpn-shard-0&authSource=admin&retryWrites=true&w=majority&appName=ProductCard"
     );
     console.log("Connected to MongoDB");
 

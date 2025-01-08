@@ -1,16 +1,9 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { GlobalStyles } from "../../../../constants/style";
 import { currencyFormat } from "../../../../utils/currencyFormat";
 
-const CartItemSubcribe = ({
-  productCourse,
-  onDecrement,
-  onIncrement,
-  onCheckProduct,
-  checked,
-}) => {
+const CartItemSubcribe = ({ productCourse }) => {
   return (
     <View
       style={{

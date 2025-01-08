@@ -48,7 +48,7 @@ const CartSellingList = ({ product, onIncrement, onDecrement }) => {
             fontWeight: 600,
           }}
         >
-          {product.farmId.name}
+          {/* {product.farmId.name} */}
         </Text>
       </View>
       <CartItemSellingItem

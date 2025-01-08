@@ -6,6 +6,7 @@ import nodemailer from "nodemailer";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import http from "http";
 
 import User from "./models/user.js";
 import Product from "./models/product.js";
@@ -15,7 +16,7 @@ import Order from "./models/order.js";
 import { connectToDatabase } from "./config/db.js";
 
 import productRoutes from "./routes/products.js";
-import cartRoutes from "./routes/cartlist.js";
+
 import farmRoutes from "./routes/farm.js";
 import addressRoutes from "./routes/address.js";
 import ordersRoutes from "./routes/orders.js";
@@ -25,14 +26,13 @@ import topupRoutes from "./routes/topup.js";
 import paymentRoutes from "./routes/payment.js";
 import paymentcreditcardRoutes from "./routes/payment.js";
 import productCourseRoutes from "./routes/course/productCourses.js";
-import cartCourseRoutes from "./routes/course/cartCourses.js";
 import orderCourseRoutes from "./routes/course/orderCourses.js";
-import wishlistCourseRoutes from "./routes/course/wishlistCourses.js";
-import wishlistRoutes from "./routes/wishlist.js";
 import productFundRoutes from "./routes/funding/productFunds.js";
+import chatRoutes from "./routes/chat/chat.js";
 import { BASE_URL } from "./config/apiConfig.js";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import { Server } from "socket.io";
 
 dotenv.config();
 
@@ -40,6 +40,12 @@ dotenv.config();
 connectToDatabase();
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 const port = 8000;
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
@@ -86,6 +92,19 @@ const sendVerificationEmail = async (email, verificationToken) => {
     console.error("Error sending verification email:", error);
   }
 };
+
+// Real-time communication with Socket.IO
+io.on("connection", (socket) => {
+  console.log("A user connected", socket.id);
+
+  socket.on("join_chat", (chatId) => {
+    console.log(`User joined chat: ${chatId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
 
 // Register a new user
 app.post("/register", async (req, res) => {
@@ -254,18 +273,19 @@ app.use(paymentcreditcardRoutes);
 //e-commerce router
 app.use(productRoutes);
 app.use(ordersRoutes);
-app.use(wishlistRoutes);
-app.use(cartRoutes);
+
 app.use(farmRoutes);
 
 //course router
 app.use(productCourseRoutes);
-app.use(cartCourseRoutes);
+
 app.use(orderCourseRoutes);
-app.use(wishlistCourseRoutes);
 
 //fund router
 app.use(productFundRoutes);
+
+//chat router
+app.use(chatRoutes);
 
 // Start server
 app.listen(port, () => {

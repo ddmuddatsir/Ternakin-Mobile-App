@@ -1,5 +1,8 @@
 import { ScrollView, Text, View } from "react-native";
-import ProductSubcribe from "./ProductSubcribe";
+import {
+  ProductSubcribe,
+  ProductSubcribeRecommendation,
+} from "./ProductSubcribe";
 import { useEffect, useState } from "react";
 import { fetchData } from "../../../utils/fetchData";
 
@@ -17,13 +20,9 @@ const ProductSubcribeList = ({ recommendation, productId }) => {
     const data = await fetchData(`/product-courses`);
 
     if (data) {
-      const fetchedProductCourses = data;
+      const shuffledCourses = [...data].sort(() => Math.random() - 0.5);
 
-      const shuffledCourses = [...fetchedProductCourses].sort(
-        () => Math.random() - 0.5
-      );
-
-      setProductCourse(fetchedProductCourses);
+      setProductCourse(data);
       setRandomizedProductCourse(shuffledCourses);
     } else {
       console.error("failed to load data course product:", error);
@@ -57,9 +56,8 @@ const ProductSubcribeList = ({ recommendation, productId }) => {
             // .sort(() => Math.random() - 0.5)
             .slice(0, 4)
             .map((item) => (
-              <ProductSubcribe
+              <ProductSubcribeRecommendation
                 key={item._id}
-                recommendation={true}
                 productCourse={item}
               />
             ))}

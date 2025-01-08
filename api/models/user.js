@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 import Product from "./product.js";
-import Cart from "./cartlist.js";
+
 import Order from "./order.js";
 import Wallet from "./wallet.js";
 
@@ -38,14 +38,13 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
-    Products: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
-      },
-    ],
-    wishlist: { type: mongoose.Schema.Types.ObjectId, ref: "Wishlist" },
-    cartlist: { type: mongoose.Schema.Types.ObjectId, ref: "Cart" },
+    // Products: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Product",
+    //   },
+    // ],
+
     orders: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
     wallet: { type: mongoose.Schema.Types.ObjectId, ref: "Wallet" },
     createdAt: {

@@ -1,3 +1,4 @@
+import "react-native-get-random-values";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
@@ -12,7 +13,7 @@ import CommunityAndConsultScreen from "./screens/CommunityAndConsultScreen";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import CartScreen from "./screens/CartScreen";
-import ChatScreen from "./screens/ChatScreen";
+
 import BuyConfirmationScreen from "./screens/BuyConfirmationScreen";
 import DetailFarmSelling from "./screens/DetailFarmSelling";
 
@@ -23,16 +24,28 @@ import BuyNowScreen from "./screens/BuyNowScreen";
 import SaldoScreen from "./screens/SaldoScreen";
 import DetailProductCourse from "./screens/course/DetailProductCourse";
 import TabTopCart from "./navigations/TabTopCart";
-import CartFundingScreen from "./screens/funding/CartFundingScreen";
 import CartCourseScreen from "./screens/course/CartCourseScreen";
-import MyWishlistScreen from "./screens/MyWishlistScreen";
 import DetailProductFund from "./screens/funding/DetailProductFund";
 import SearchProductScreen from "./screens/search/SearchProductScreen";
 import ResultProductSearchScreen from "./screens/search/ResultProductSearchScreen";
+import ListFundScreen from "./screens/funding/ListFundScreen";
+import ListCourseScreen from "./screens/course/ListCourseScreen";
+import PointScreen from "./screens/PointScreen";
+import TopUpScreen from "./screens/wallet/TopUpScreen";
+import { useEffect } from "react";
+import { initializeWishlistCourse } from "./redux/Course/WishlistCourseReducer";
+import WishlistCourseScreen from "./screens/course/WishlistCourseScreen";
+import { initializeWishlist } from "./redux/WishlistReducer";
+import WishlistScreen from "./screens/WishlistScreen";
+import ChatWindowScreen from "./screens/Chat/ChatWindowScreen";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  useEffect(() => {
+    store.dispatch(initializeWishlistCourse());
+    store.dispatch(initializeWishlist());
+  }, []);
   return (
     <>
       <Provider store={store}>
@@ -58,12 +71,10 @@ export default function App() {
               <Stack.Screen name="Cart" component={TabTopCart} />
 
               <Stack.Screen name="CartProduct" component={CartScreen} />
-              <Stack.Screen name="CartFunding" component={CartFundingScreen} />
               <Stack.Screen
                 name="BuyConfirmation"
                 component={BuyConfirmationScreen}
               />
-              <Stack.Screen name="Chat" component={ChatScreen} />
               <Stack.Screen
                 name="ProductDetailSelling"
                 component={DetailProductSelling}
@@ -80,6 +91,7 @@ export default function App() {
               />
 
               <Stack.Screen name="BuyNow" component={BuyNowScreen} />
+              <Stack.Screen name="Wishlist" component={WishlistScreen} />
               <Stack.Screen
                 name="SaldoScreen"
                 component={SaldoScreen}
@@ -94,9 +106,10 @@ export default function App() {
                   headerShown: false,
                 }}
               />
-              <Stack.Screen name="Wishlist" component={MyWishlistScreen} />
+
               <Stack.Screen name="AddressList" component={AddressListScreen} />
               <Stack.Screen name="AddAddress" component={AddAddressScreen} />
+              <Stack.Screen name="PointScreen" component={PointScreen} />
 
               <Stack.Screen
                 name="InvestationAndFarmScreen"
@@ -112,11 +125,20 @@ export default function App() {
                 component={DetailProductCourse}
               />
               <Stack.Screen name="CartCourse" component={CartCourseScreen} />
+              <Stack.Screen
+                name="WishlistCourse"
+                component={WishlistCourseScreen}
+              />
 
               {/* Screen fund feature */}
               <Stack.Screen
                 name="ProductDetailFund"
                 component={DetailProductFund}
+              />
+              <Stack.Screen name="ListProductFund" component={ListFundScreen} />
+              <Stack.Screen
+                name="ListProductCourse"
+                component={ListCourseScreen}
               />
 
               {/* Screen for search feature */}
@@ -125,6 +147,12 @@ export default function App() {
                 name="ResultSearch"
                 component={ResultProductSearchScreen}
               />
+
+              {/* Screen for wallet feature */}
+              <Stack.Screen name="TopUpScreen" component={TopUpScreen} />
+
+              {/* Screen for chat feature */}
+              <Stack.Screen name="ChatWindow" component={ChatWindowScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </UserContext>

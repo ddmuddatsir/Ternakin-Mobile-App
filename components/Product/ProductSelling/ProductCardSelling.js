@@ -84,7 +84,8 @@ const ProductCardSelling = ({ product, productFarmList }) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Rp{currencyFormat(discountedPrice)}
+                    Rp
+                    {currencyFormat(discountedPrice)}
                   </Text>
 
                   <View
@@ -101,16 +102,17 @@ const ProductCardSelling = ({ product, productFarmList }) => {
                         textDecorationLine: "line-through",
                       }}
                     >
-                      Rp{currencyFormat(product.price)}
+                      Rp
+                      {product.price}
                     </Text>
                   </View>
                 </View>
               </View>
-              {product.farmId && (
+              {product.farm && (
                 <Text
                   style={{ fontSize: 11, color: GlobalStyles.colors.text100 }}
                 >
-                  {product.farmId.location}
+                  {product.farm.location}
                 </Text>
               )}
               <View style={{ flexDirection: "row", gap: 4 }}>
@@ -158,7 +160,8 @@ const ProductCardSelling = ({ product, productFarmList }) => {
                 fontWeight: "bold",
               }}
             >
-              Rp{currencyFormat(discountedPrice)}
+              Rp
+              {currencyFormat(discountedPrice)}
             </Text>
           </View>
         </Pressable>

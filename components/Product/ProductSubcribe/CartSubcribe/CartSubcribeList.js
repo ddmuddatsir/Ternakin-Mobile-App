@@ -1,8 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
-
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { StyleSheet, View } from "react-native";
 import CartItemSubcribe from "./CartItemSubcribe";
-import { GlobalStyles } from "../../../../constants/style";
 
 const CartSubcribeList = ({ productCourse }) => {
   return (

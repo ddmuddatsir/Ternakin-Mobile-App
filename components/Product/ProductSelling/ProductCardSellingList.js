@@ -76,7 +76,6 @@ const ProductCardSellingList = ({ filter }) => {
               flexWrap: "wrap",
               justifyContent: "space-between",
               gap: 12,
-              // padding: 10,
             }}
           >
             {product.map((item) => (

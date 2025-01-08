@@ -23,40 +23,29 @@ import Button from "../components/Button/Button";
 import AddedValueCard from "../components/UI/AddedValueCard";
 import FarmCard from "../components/UI/FarmCard";
 import ConversationCard from "../components/UI/ConversationCard";
-import axiosInstance from "../utils/axiosInstance";
-import { addToWishlist, removeFromWishlist } from "../redux/WishlistReducer";
-import { getAuthToken } from "../utils/getAuthToken";
+
 import { currencyFormat } from "../utils/currencyFormat";
 import { fetchData } from "../utils/fetchData";
+
+import { addToWishlist, removeFromWishlist } from "../redux/WishlistReducer";
+import axiosInstance from "../utils/axiosInstance";
+import { getAuthToken } from "../utils/getAuthToken";
 
 const DetailProductSelling = ({ route }) => {
   const { productId } = route.params;
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
-  const wishlist = useSelector((state) => state.wishlist.items);
+  const wishlist = useSelector((state) => state.wishlist.wishlist);
   const navigation = useNavigation();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [setAddedToCart] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [isInWishlist, setIsInWishlist] = useState(false);
 
   useEffect(() => {
-    const fetchWishlistStatus = () => {
-      // Pastikan wishlist selalu terdefinisi dan merupakan array
-      const wishlistItems = wishlist || []; // Default ke array kosong jika wishlist undefined
-      // const isInWishlist = wishlistItems.some((item) => item._id === productId);
-      const isProductInWishlist = wishlistItems.some(
-        (item) => item._id === productId
-      );
-
-      setIsInWishlist(isProductInWishlist);
-    };
-
     fetchDataProductDetail();
-    fetchWishlistStatus();
-  }, [productId, wishlist]);
+  }, [productId]);
 
   const fetchDataProductDetail = async () => {
     setLoading(true);
@@ -75,35 +64,6 @@ const DetailProductSelling = ({ route }) => {
     return <Text>Product not found.</Text>;
   }
 
-  const discountedPrice =
-    product.price - (product.price * product.discPer) / 100;
-
-  const saveCartToBackend = async (cartItem) => {
-    try {
-      const token = await getAuthToken();
-      const payload = {
-        items: [
-          {
-            productId: cartItem._id,
-            quantity: cartItem.quantity,
-          },
-        ],
-      };
-      console.log("Payload being sent to backend:", payload);
-
-      const response = await axiosInstance.post("/carts", payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      console.log("Cart saved to backend:", response.data);
-    } catch (error) {
-      console.error(
-        "Error saving cart to backend:",
-        error.response?.data || error
-      );
-    }
-  };
-
   const addItemToCart = (product) => {
     const cartItem = {
       ...product,
@@ -113,21 +73,24 @@ const DetailProductSelling = ({ route }) => {
 
     setAddedToCart(true);
     dispatch(addToCart(cartItem)); // Simpan ke Redux state
-    saveCartToBackend(cartItem); // Simpan ke database
 
     setTimeout(() => {
       setAddedToCart(false);
     }, 60000);
   };
 
+  const isInWishlist = wishlist.some((item) => item._id === productId);
+
   const handleAddToWishlist = () => {
     if (isInWishlist) {
-      dispatch(removeFromWishlist(productId));
+      dispatch(removeFromWishlist(product));
     } else {
-      dispatch(addToWishlist(productId));
+      dispatch(addToWishlist(product));
     }
-    setIsInWishlist(!isInWishlist);
   };
+
+  const discountedPrice =
+    product.price - (product.price * product.discPer) / 100;
 
   return (
     <>
@@ -316,6 +279,7 @@ const DetailProductSelling = ({ route }) => {
             shippingLocation={product.shippingMethodId.location}
             shippingMethodId={product.shippingMethodId.method}
           />
+
           <FarmCard
             img={{ uri: product.farmId.image }}
             name={product.farmId.name}

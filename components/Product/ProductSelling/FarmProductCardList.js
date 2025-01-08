@@ -1,48 +1,50 @@
-import { ScrollView, Text, View } from "react-native";
-import { useEffect, useState } from "react";
-import FarmProductCardItem from "./FarmProductCardItem";
-import { fetchData } from "../../../utils/fetchData";
+// import { ScrollView, Text, View } from "react-native";
+// import { useEffect, useState } from "react";
+// import FarmProductCardItem from "./FarmProductCardItem";
+// import { fetchData } from "../../../utils/fetchData";
 
-const FarmProductCardList = () => {
-  const [farm, setFarm] = useState([]);
-  const [loading, setLoading] = useState(true);
+// const FarmProductCardList = () => {
+//   const [farm, setFarm] = useState([]);
+//   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchFarmData();
-  }, [farm._id]);
+//   useEffect(() => {
+//     fetchFarmData();
+//   }, []);
 
-  const fetchFarmData = async () => {
-    setLoading(true);
-    const data = await fetchData("/farm");
+//   const fetchFarmData = async () => {
+//     setLoading(true);
+//     const data = await fetchData("/farm");
 
-    if (data) {
-      setFarm(data);
-    } else {
-      console.error("Failed to load farm data.");
-    }
-    setLoading(false);
-  };
+//     if (data) {
+//       setFarm(data);
+//     } else {
+//       console.error("Failed to load farm data.");
+//     }
+//     setLoading(false);
+//   };
 
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
+//   if (loading) {
+//     return <Text>Loading...</Text>;
+//   }
 
-  return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <View
-        style={{
-          flex: 1,
-          flexWrap: "wrap",
-          justifyContent: "space-between",
-          gap: 12,
-        }}
-      >
-        {farm.map((item) => (
-          <FarmProductCardItem key={item._id} farm={item} />
-        ))}
-      </View>
-    </ScrollView>
-  );
-};
+//   return (
+//     <ScrollView showsVerticalScrollIndicator={false}>
+//       <View
+//         style={{
+//           flex: 1,
+//           flexWrap: "wrap",
+//           justifyContent: "space-between",
+//           gap: 12,
+//         }}
+//       >
+//         {farm.map((item) => (
+//           <View key={item._id}>
+//             <FarmProductCardItem farm={item} />
+//           </View>
+//         ))}
+//       </View>
+//     </ScrollView>
+//   );
+// };
 
-export default FarmProductCardList;
+// export default FarmProductCardList;

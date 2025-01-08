@@ -9,11 +9,8 @@ const router = express.Router();
 //new order
 router.post("/orders", authenticate, async (req, res) => {
   try {
-    const {
-      products,
-      totalAmount,
-      //  shippingAddress, shippingMethodId
-    } = req.body;
+    const { products, totalAmount, shippingAddress, shippingMethodId } =
+      req.body;
     const { userId } = req.user;
 
     if (!products) {
@@ -30,10 +27,10 @@ router.post("/orders", authenticate, async (req, res) => {
       user: userId,
       products,
       totalAmount,
-      // shippingAddress,
-      // shippingMethodId,
-      // shippingAddress: req.body.shippingAddress || "Default Address",
-      // shippingMethodId: req.body.shippingMethodId || null,
+      shippingAddress,
+      shippingMethodId,
+      shippingAddress: req.body.shippingAddress || "Default Address",
+      shippingMethodId: req.body.shippingMethodId || null,
     });
 
     // console.log("Order data received:", {
@@ -58,10 +55,9 @@ router.get("/orders", authenticate, async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const orders = await Order.find({ user: userId }).populate(
-      "products.productId"
-    );
-    // .populate("shippingMethodId");
+    const orders = await Order.find({ user: userId })
+      .populate("products.productId")
+      .populate("shippingMethodId");
 
     if (!orders.length) {
       return res.status(404).json({ message: "No orders found" });
@@ -83,6 +79,7 @@ router.patch("/orders/:orderId", authenticate, async (req, res) => {
 
     // Validasi status baru
     const validStatuses = [
+      "Payment",
       "Pending",
       "Processing",
       "Shipped",

@@ -1,5 +1,4 @@
 //Perbaiki: Course Compponent
-//Perbaiki: Logika
 //Perbaiki: Review Belum ada
 
 import {
@@ -24,23 +23,34 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Button from "../../components/Button/Button";
 import ProductSubcribeList from "../../components/Product/ProductSubcribe/ProductSubcribeList";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCartCourse } from "../../redux/Course/CartCourseReducer";
 import { currencyFormat } from "../../utils/currencyFormat";
 import { fetchData } from "../../utils/fetchData";
+import {
+  addToWishlistCourse,
+  removeFromWishlistCourse,
+} from "../../redux/Course/WishlistCourseReducer";
+import { useNavigation } from "@react-navigation/native";
 
 const DetailProductCourse = ({ route }) => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const { productId } = route.params;
+  const cartCourse = useSelector((state) => state.cartCourse.cartCourse);
+  const wishlistCourse = useSelector(
+    (state) => state.wishlistCourse.wishlistCourse
+  );
 
   const [productCourse, setProductCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [playCourse, setPlayCourse] = useState(null);
+  const [addedToCart, setAddedToCart] = useState(true);
 
   useEffect(() => {
     fetchDataProductCorseDetail();
-  }, []);
+  }, [productId]);
 
   const fetchDataProductCorseDetail = async () => {
     setLoading(true);
@@ -55,6 +65,18 @@ const DetailProductCourse = ({ route }) => {
     setLoading(false);
   };
 
+  const isInWishlistCourse = wishlistCourse.some(
+    (item) => item._id === productId
+  );
+
+  const handleWishlistToggle = () => {
+    if (isInWishlistCourse) {
+      dispatch(removeFromWishlistCourse(productCourse));
+    } else {
+      dispatch(addToWishlistCourse(productCourse));
+    }
+  };
+
   const handlePlayCourseToggle = (index) => {
     setPlayCourse((prevIndex) => (prevIndex === index ? null : index));
   };
@@ -63,8 +85,12 @@ const DetailProductCourse = ({ route }) => {
 
   if (error) return <Text>{error}</Text>;
 
-  const handleAddToCartCourse = () => {
-    dispatch(addToCartCourse({ productId: productCourse._id }));
+  const addItemToCartCourse = (productCourse) => {
+    const cartCourseItem = {
+      ...productCourse,
+    };
+    setAddedToCart(true);
+    dispatch(addToCartCourse(cartCourseItem));
   };
 
   return (
@@ -254,32 +280,14 @@ const DetailProductCourse = ({ route }) => {
               Rp{currencyFormat(productCourse.price)}
             </Text>
           </View>
-          <View>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
             {/* Button CTA in screen */}
+
             <Pressable
               style={{
-                backgroundColor: GlobalStyles.colors.light,
-                borderWidth: 2,
-                borderColor: GlobalStyles.colors.primary100,
-                padding: 14,
-                marginVertical: 4,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: 12,
-              }}
-            >
-              <Text
-                style={{
-                  color: GlobalStyles.colors.primary100,
-                  fontWeight: 600,
-                  fontSize: 14,
-                }}
-              >
-                Add to Wishlist
-              </Text>
-            </Pressable>
-            <Pressable
-              style={{
+                flex: 1,
                 backgroundColor: GlobalStyles.colors.primary100,
                 padding: 14,
                 marginVertical: 4,
@@ -298,6 +306,48 @@ const DetailProductCourse = ({ route }) => {
                 Buy Now
               </Text>
             </Pressable>
+            <View style={{ flexDirection: "row" }}>
+              <Pressable
+                onPress={handleWishlistToggle}
+                style={{
+                  backgroundColor: GlobalStyles.colors.light,
+
+                  borderColor: GlobalStyles.colors.primary100,
+                  paddingLeft: 14,
+                  marginVertical: 4,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 12,
+                }}
+              >
+                <Ionicons
+                  name={isInWishlistCourse ? "heart" : "heart-outline"}
+                  size={24}
+                  color={
+                    isInWishlistCourse ? "red" : GlobalStyles.colors.gray500
+                  }
+                />
+              </Pressable>
+              <Pressable
+                onPress={handleWishlistToggle}
+                style={{
+                  backgroundColor: GlobalStyles.colors.light,
+
+                  borderColor: GlobalStyles.colors.primary100,
+                  padding: 14,
+                  marginVertical: 4,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 12,
+                }}
+              >
+                <Ionicons
+                  name="share-social-outline"
+                  size={24}
+                  color={GlobalStyles.colors.gray500}
+                />
+              </Pressable>
+            </View>
           </View>
 
           {/* apa saja yang akan di pelajari */}
@@ -644,7 +694,7 @@ const DetailProductCourse = ({ route }) => {
           </View>
         </Pressable>
         <Button
-          onPress={handleAddToCartCourse}
+          onPress={() => addItemToCartCourse(productCourse)}
           text="Add to Cart"
           color="off"
           styles={{

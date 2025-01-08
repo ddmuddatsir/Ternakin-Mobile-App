@@ -23,7 +23,7 @@ const HeaderBar = ({
   };
 
   const handleOnPressChat = () => {
-    navigation.navigate("Chat");
+    navigation.navigate("ChatWindow");
   };
 
   const getTotalQuantity = () => {

@@ -13,27 +13,33 @@ import { fetchData } from "../utils/fetchData";
 const TopTabs = createMaterialTopTabNavigator();
 
 const DetailFarmSelling = ({ route }) => {
-  const { farmId } = route.params;
+  const { farmId, initialTab, productFundId } = route.params;
 
   const [farm, setFarm] = useState(null);
+  const [productFund, setProductFund] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchDataFarmdDetail();
-  }, [farmId]);
+    const fetchDataDetails = async () => {
+      setLoading(true);
 
-  const fetchDataFarmdDetail = async () => {
-    setLoading(true);
-    const data = await fetchData(`/farm/${farmId}`);
+      try {
+        // Fetch farm data
+        const farmData = await fetchData(`/farm/${farmId}`);
+        // Fetch product fund data using the farmId
+        const fundData = await fetchData(`/product-funds/${productFundId}`);
 
-    if (data) {
-      setFarm(data);
-    } else {
-      console.error("Failed to load Farm detail data");
-    }
+        if (farmData) setFarm(farmData);
+        if (fundData) setProductFund(fundData);
+      } catch (error) {
+        console.error("Failed to load data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setLoading(false);
-  };
+    fetchDataDetails();
+  }, [farmId, productFundId]);
 
   if (loading) {
     return <Text>loading...</Text>;
@@ -51,6 +57,11 @@ const DetailFarmSelling = ({ route }) => {
         <View style={{ padding: 10 }}>
           <HeadFarmDetail details={farm} />
           <TopTabs.Navigator
+            initialRouteName={
+              initialTab === "Product" || initialTab === "Detail Funding"
+                ? initialTab
+                : "Product"
+            }
             screenOptions={{
               tabBarLabelStyle: { fontSize: 12 },
               tabBarIndicatorStyle: {
@@ -66,7 +77,7 @@ const DetailFarmSelling = ({ route }) => {
 
             <TopTabs.Screen
               name="Detail Funding"
-              children={() => <DetailFund fundComponent={farm.productFundId} />}
+              children={() => <DetailFund fundComponent={productFund} />}
             />
           </TopTabs.Navigator>
         </View>

@@ -28,7 +28,7 @@ const DetailFund = ({ fundComponent }) => {
             paddingTop: 8,
           }}
         >
-          {fundComponent.title}
+          {fundComponent?.title}
         </Text>
         <View
           style={{
@@ -50,7 +50,7 @@ const DetailFund = ({ fundComponent }) => {
             </Text>
             <Text>
               Rp
-              {fundComponent.fundingGoal}
+              {fundComponent?.fundingGoal}
             </Text>
           </View>
           <View style={{ alignItems: "center" }}>
@@ -70,7 +70,7 @@ const DetailFund = ({ fundComponent }) => {
               }}
             >
               Rp
-              {(fundComponent.fundingGoal / fundComponent.profitSharing) * 10}
+              {(fundComponent?.fundingGoal / fundComponent?.profitSharing) * 10}
             </Text>
           </View>
           <View style={{ alignItems: "center" }}>
@@ -83,7 +83,7 @@ const DetailFund = ({ fundComponent }) => {
             >
               Funding Tenor
             </Text>
-            <Text>{fundComponent.duration} Month</Text>
+            <Text>{fundComponent?.duration} Month</Text>
           </View>
         </View>
         <View
@@ -156,15 +156,15 @@ const DetailFund = ({ fundComponent }) => {
             </Text>
           </View>
           <View style={{ gap: 6, alignItems: "flex-end" }}>
-            <Text>{fundComponent.status}</Text>
+            <Text>{fundComponent?.status}</Text>
 
             <Text>Pendanaan Ke</Text>
-            <Text>Rp{fundComponent.weeklyInstallment}</Text>
-            <Text>Rp{fundComponent.monthlyIncome}</Text>
+            <Text>Rp{fundComponent?.weeklyInstallment}</Text>
+            <Text>Rp{fundComponent?.monthlyIncome}</Text>
             <Text>Pekerjaan</Text>
             <Text>Sector</Text>
-            <Text>{fundComponent.akad}</Text>
-            <Text>{fundComponent.riskLevel}</Text>
+            <Text>{fundComponent?.akad}</Text>
+            <Text>{fundComponent?.riskLevel}</Text>
           </View>
         </View>
 

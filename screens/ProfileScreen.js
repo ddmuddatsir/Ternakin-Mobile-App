@@ -18,10 +18,19 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchWalletData } from "../redux/WalletReducer";
+import { currencyFormat } from "../utils/currencyFormat";
 
 const ProfileScreen = () => {
   const [userData, setUserData] = useState({ name: "", email: "", token: "" });
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { wallet, error, loading } = useSelector((state) => state.wallet);
+
+  useEffect(() => {
+    dispatch(fetchWalletData());
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -173,7 +182,8 @@ const ProfileScreen = () => {
               padding: 18,
             }}
           >
-            <View
+            <Pressable
+              onPress={() => navigation.navigate("SaldoScreen")}
               style={{ justifyContent: "center", alignItems: "center", gap: 4 }}
             >
               <Ionicons name="wallet-outline" size={24} color="brown" />
@@ -191,9 +201,9 @@ const ProfileScreen = () => {
                   color: GlobalStyles.colors.text700,
                 }}
               >
-                Rp300.000
+                {/* Rp{currencyFormat(wallet.balance)} */}
               </Text>
-            </View>
+            </Pressable>
             <View
               style={{ justifyContent: "center", alignItems: "center", gap: 4 }}
             >
@@ -216,7 +226,7 @@ const ProfileScreen = () => {
                   color: GlobalStyles.colors.text700,
                 }}
               >
-                134.000
+                0
               </Text>
             </View>
           </View>
@@ -483,6 +493,42 @@ const ProfileScreen = () => {
               />
             </View>
           </View>
+          <Pressable
+            onPress={() => navigation.navigate("WishlistCourse")}
+            style={{
+              flexDirection: "row",
+              paddingBottom: 8,
+              borderBottomWidth: 1,
+              borderBottomColor: GlobalStyles.colors.store_line,
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+            >
+              <AntDesign
+                name="questioncircleo"
+                size={20}
+                color={GlobalStyles.colors.text100}
+              />
+              <Text
+                style={{
+                  color: GlobalStyles.colors.text100,
+                  fontSize: 16,
+                }}
+              >
+                Wishlist Course
+              </Text>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <MaterialIcons
+                name="keyboard-arrow-right"
+                size={18}
+                color={GlobalStyles.colors.gray100}
+              />
+            </View>
+          </Pressable>
           <View
             style={{
               flexDirection: "row",
@@ -518,6 +564,7 @@ const ProfileScreen = () => {
               />
             </View>
           </View>
+
           <Pressable
             onPress={handleLogout}
             style={{

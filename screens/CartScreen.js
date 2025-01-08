@@ -1,5 +1,3 @@
-//Perbaiki: Belum connect ke backend
-
 import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { GlobalStyles } from "../constants/style";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -11,8 +9,8 @@ import {
   decrementQuantity,
   incrementQuantity,
   cleanCart,
-  fetchCartFromBackend,
   deleteAllCartItems,
+  loadCart,
 } from "../redux/CartReducer";
 import BottomTabButton from "../components/Button/BottomTabButton";
 import Button from "../components/Button/Button";
@@ -22,7 +20,7 @@ import TitleForList from "../components/Title/TitleForList";
 import { useNavigation } from "@react-navigation/native";
 import AddressButton from "../components/Address/AddressButton";
 import { useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { currencyFormat } from "../utils/currencyFormat";
 
 const CartScreen = () => {
   const navigation = useNavigation();
@@ -31,8 +29,9 @@ const CartScreen = () => {
   const discount = useSelector((state) => state.cart.discount);
   const dispatch = useDispatch();
 
+  // Load cart from AsyncStorage when the component mounts
   useEffect(() => {
-    dispatch(fetchCartFromBackend());
+    dispatch(loadCart());
   }, [dispatch]);
 
   const handleRemoveAllItems = () => {
@@ -61,8 +60,6 @@ const CartScreen = () => {
       0
     );
   };
-
-  // console.log(cart);
 
   return (
     <>
@@ -201,7 +198,7 @@ const CartScreen = () => {
                 color: GlobalStyles.colors.primary100,
               }}
             >
-              Rp{total}
+              Rp{currencyFormat(total)}
             </Text>
           </View>
           {
@@ -225,7 +222,7 @@ const CartScreen = () => {
                   color: GlobalStyles.colors.primary100,
                 }}
               >
-                Rp{discount}
+                Rp{currencyFormat(discount)}
               </Text>
             </View>
           }

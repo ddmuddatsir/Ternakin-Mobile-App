@@ -1,42 +1,30 @@
-//Perbaiki: data ketika di fetching tidak tervisualisasi atau null
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axiosInstance from "../../utils/axiosInstance";
+// Fungsi untuk menyimpan data cart ke AsyncStorage
+const saveCartCourseToStorage = async (cartCourse) => {
+  try {
+    await AsyncStorage.setItem("@cartCourse_data", JSON.stringify(cartCourse));
+  } catch (error) {
+    console.error("Error saving cart course data:", error);
+  }
+};
 
-export const fetchCartCourse = createAsyncThunk(
-  "cartCourse/fetchCartCourse",
+// Fungsi untuk memuat data cart dari AsyncStorage
+export const loadCartCourse = createAsyncThunk(
+  "cartCourse/loadCartCourse",
   async () => {
-    const response = await axiosInstance.get(`/cart-courses`);
-    return response.data;
+    try {
+      const storedCartCourse = await AsyncStorage.getItem("@cartCourse_data");
+      return storedCartCourse ? JSON.parse(storedCartCourse) : [];
+    } catch (error) {
+      console.error("Error loading cart data:", error);
+      return [];
+    }
   }
 );
 
-export const addToCartCourse = createAsyncThunk(
-  "cartCourse/addToCartCourse",
-  async ({ productId }) => {
-    const response = await axiosInstance.post(`/cart-courses`, {
-      productId,
-    });
-    return response.data;
-  }
-);
-
-export const removeFromCartCourse = createAsyncThunk(
-  "cartCourse/removeFromCartCourse",
-  async (productId) => {
-    const response = await axiosInstance.delete(`/cart-courses/${productId}`);
-    return response.data;
-  }
-);
-
-export const clearCartCourse = createAsyncThunk(
-  "cartCourse/clearCartCourse",
-  async () => {
-    const response = await axiosInstance.delete(`/cart-courses`);
-    return response.data;
-  }
-);
-
+// Slice Redux untuk cart course
 export const CartCourseSlice = createSlice({
   name: "cartCourse",
   initialState: {
@@ -44,31 +32,46 @@ export const CartCourseSlice = createSlice({
     status: "idle",
     error: null,
   },
+  reducers: {
+    addToCartCourse(state, action) {
+      const product = action.payload;
+      const existingProduct = state.cartCourse.find(
+        (item) => item._id === product._id
+      );
 
-  reducers: {},
+      if (!existingProduct) {
+        state.cartCourse.push(product);
+      }
+    },
+    removeFromCartCourse(state, action) {
+      const product = action.payload;
+      state.cartCourse = state.cartCourse.filter(
+        (item) => item._id !== product._id
+      );
+    },
+
+    cleanCartCourse(state) {
+      state.cartCourse = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchCartCourse.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchCartCourse.fulfilled, (state, action) => {
-        state.status = "succeeded";
+      .addCase(loadCartCourse.fulfilled, (state, action) => {
         state.cartCourse = action.payload;
       })
-      .addCase(fetchCartCourse.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      })
-      .addCase(addToCartCourse.fulfilled, (state, action) => {
-        state.cartCourse = action.payload;
-      })
-      .addCase(removeFromCartCourse.fulfilled, (state, action) => {
-        state.cartCourse = action.payload;
-      })
-      .addCase(clearCartCourse.fulfilled, (state) => {
-        state.cartCourse = [];
-      });
+      .addMatcher(
+        (action) =>
+          action.type.endsWith("Course/addToCartCourse") ||
+          action.type.endsWith("Course/removeFromCartCourse") ||
+          action.type.endsWith("Course/cleanCartCourse"),
+        (state, action) => {
+          saveCartCourseToStorage(state.cartCourse);
+        }
+      );
   },
 });
+
+export const { addToCartCourse, removeFromCartCourse, cleanCartCourse } =
+  CartCourseSlice.actions;
 
 export default CartCourseSlice.reducer;

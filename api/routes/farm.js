@@ -1,5 +1,6 @@
 import express from "express";
 import Product from "../models/product.js";
+import ProductFund from "../models/funding/productFund.js";
 import SalesReportFarm from "../models/salesReportFarm.js";
 import { authenticate } from "../middleware/authenticate.js";
 import Farm from "../models/farm.js";

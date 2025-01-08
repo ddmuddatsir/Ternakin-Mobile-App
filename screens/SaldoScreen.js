@@ -1,98 +1,174 @@
+import React, { useState, useEffect, useRef } from "react";
 import {
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
   View,
+  Text,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+  Button,
 } from "react-native";
-import React, { useEffect } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchWalletData,
+  topUpWallet,
+  makePayment,
+  resetError,
+  createWallet,
+} from "../redux/WalletReducer";
+
+import axiosInstance from "../utils/axiosInstance";
+import { getAuthToken } from "../utils/getAuthToken";
+import { fetchData } from "../utils/fetchData";
 import HeaderBar from "../components/HeaderBar/HeaderBar";
 import { GlobalStyles } from "../constants/style";
-import axios from "axios";
-import { BASE_URL } from "../api/config/apiConfig";
 
-const SaldoScreen = ({ route }) => {
-  const { userId } = route.params;
-  const [saldo, setSaldo] = useState(null);
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import TitleForList from "../components/Title/TitleForList";
+import PaymentHistoryTransCard from "../components/Payment/PaymentHistoryTransCard";
+import WalletButton from "../components/Button/WalletButton";
+
+const SaldoScreen = () => {
+  const [amount, setAmount] = useState("");
+  const [descript, setDescript] = useState("");
+  const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchSaldo = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${BASE_URL}/wallet/${userId}`);
-        setSaldo(response.data.balance);
-      } catch (error) {
-        Alert.alert("Error", "Failed to collect balance. Please try again.");
-        console.error("Error fetching wallet", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const dispatch = useDispatch();
+  // const { wallet, transactions, loading, error } = useSelector(
+  //   (state) => state.payment
+  // );
 
-    console.log(userId);
-    fetchSaldo();
-  }, [userId]);
+  useEffect(() => {
+    fetchWallet();
+  }, [dispatch]);
+
+  const createWallet = async () => {
+    try {
+      const token = await getAuthToken();
+
+      const response = await axiosInstance.post(
+        "/wallet",
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setWallet(response.data);
+      Alert.alert("Success", "Wallet has been created successfully.");
+    } catch (error) {
+      console.error(
+        "Error creating wallet:",
+        error.response?.data || error.message
+      );
+      Alert.alert(
+        "Error",
+        error.response?.data?.message || "Failed to create wallet."
+      );
+    }
+  };
+
+  const fetchWallet = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchData("/wallet");
+      setWallet(data);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Failed to fetch wallet data.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <>
-      <SafeAreaView
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: GlobalStyles.colors.light,
-        }}
-      >
-        <HeaderBar
-          withouttIcon
-          wishlist
-          back
-          active={true}
-          text={"Your Wallet"}
-        />
-      </SafeAreaView>
-      <ScrollView>
-        <View>
-          <View style={styles.container}>
-            <Text style={styles.title}>Saldo Dompet</Text>
-            <Text style={styles.saldo}>
-              Rp {saldo?.toLocaleString("id-ID")}
-            </Text>
-            <Button
-              title="Refresh"
-              onPress={() => setLoading(true)} // Refresh saldo dengan fetch ulang
-            />
-          </View>
-        </View>
-      </ScrollView>
-    </>
+    <View
+      style={{
+        backgroundColor: GlobalStyles.colors.light,
+      }}
+    >
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : wallet ? (
+        <>
+          <SafeAreaView style={{ backgroundColor: GlobalStyles.colors.light }}>
+            <HeaderBar back text={"Your Saldo"} />
+          </SafeAreaView>
+
+          {/* Transaction List */}
+          <ScrollView
+            style={{
+              marginTop: 20,
+              backgroundColor: GlobalStyles.colors.light,
+            }}
+          >
+            {/* Balance and point */}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                padding: 20,
+                gap: 120,
+              }}
+            >
+              <View>
+                <Text style={{ fontSize: 16, marginBottom: 10 }}>Balance</Text>
+                <Text style={{ fontSize: 20, marginBottom: 20 }}>
+                  Rp {wallet.balance.toLocaleString("id-ID")}
+                </Text>
+              </View>
+              <View>
+                <Text style={{ fontSize: 16, marginBottom: 10 }}>Point</Text>
+                <Text style={{ fontSize: 20, marginBottom: 20 }}>
+                  {/* {wallet.balance.toLocaleString("id-ID")} */} 0
+                </Text>
+              </View>
+            </View>
+
+            {/* Button */}
+            <WalletButton />
+            <View
+              style={{
+                padding: 12,
+                marginTop: 12,
+                backgroundColor: GlobalStyles.colors.light,
+              }}
+            >
+              <TitleForList text={"Transaction History"} />
+            </View>
+            {wallet.transactions.length > 0 ? (
+              wallet.transactions.map((item, index) => (
+                <View
+                  key={index}
+                  style={{
+                    padding: 12,
+                  }}
+                >
+                  <PaymentHistoryTransCard payment={item} />
+                </View>
+              ))
+            ) : (
+              <Text style={{ textAlign: "center", marginTop: 20 }}>
+                No transactions available.
+              </Text>
+            )}
+          </ScrollView>
+        </>
+      ) : (
+        <Text
+          style={{
+            backgroundColor: GlobalStyles.colors.light,
+          }}
+        >
+          No wallet data available.
+        </Text>
+      )}
+    </View>
   );
 };
 
 export default SaldoScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  saldo: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: "#2ecc71",
-    marginBottom: 30,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});

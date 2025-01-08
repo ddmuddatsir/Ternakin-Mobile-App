@@ -2,7 +2,18 @@ import { Pressable, Text, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { GlobalStyles } from "../../constants/style";
 
-const TitleForList = ({ text, navigate }) => {
+const TitleForList = ({ text, navigate, sizeText }) => {
+  const getFontSize = () => {
+    if (sizeText === "small") {
+      return 14;
+    } else if (sizeText === "medium") {
+      return 16;
+    } else if (sizeText === "large") {
+      return 18;
+    }
+    return 16; // Default font size
+  };
+
   return (
     <View
       style={{
@@ -15,7 +26,7 @@ const TitleForList = ({ text, navigate }) => {
       <Text
         style={{
           fontWeight: "bold",
-          fontSize: 16,
+          fontSize: getFontSize(),
           color: GlobalStyles.colors.primary,
         }}
       >

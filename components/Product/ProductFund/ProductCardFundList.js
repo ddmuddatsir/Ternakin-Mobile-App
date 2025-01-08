@@ -1,13 +1,13 @@
 import { ScrollView, Text, View } from "react-native";
 import { useEffect, useState } from "react";
-import ProductCardFundItem from "./ProductCardFundItem";
+import { ProductCardFundItem } from "./ProductCardFundItem";
+
 import { fetchData } from "../../../utils/fetchData";
 
 const ProductCardFundList = () => {
   const [productFunds, setProductFunds] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  //Fetch product funding data on database
   const fetchDataProductFarm = async () => {
     setLoading(true);
     const data = await fetchData(`/product-funds`);

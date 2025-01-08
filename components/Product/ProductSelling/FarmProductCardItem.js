@@ -7,15 +7,18 @@ import { currencyFormat } from "../../../utils/currencyFormat";
 const FarmProductCardItem = ({ farm }) => {
   const navigation = useNavigation();
 
-  const productSellingHandlePressNavigation = () => {
-    navigation.navigate("ProductDetailSelling", {
-      productId: farm.productId[0]._id,
-    });
-  };
-
   const productFarmSellingHandlePressNavigation = () => {
     navigation.navigate("FarmDetailSelling", {
       farmId: farm._id,
+      productFundId: farm.productFundId._id,
+      initialTab: "Product",
+    });
+  };
+
+  const productSellingHandlePressNavigation = (productId) => {
+    navigation.navigate("ProductDetailSelling", {
+      productId: productId,
+      // farm.productId[0]._id,
     });
   };
 
@@ -110,47 +113,52 @@ const FarmProductCardItem = ({ farm }) => {
         <View>
           <View style={{ flexDirection: "row", gap: 9 }}>
             {farm.productId.map((product) => (
-              <Pressable
-                onPress={() => productSellingHandlePressNavigation(product.id)}
-                key={product._id}
+              <View
+                key={product._id} // Pass key directly
               >
-                <View
-                  style={{
-                    width: 117,
-                    height: 117,
-                    borderRadius: 12,
-                    marginBottom: 6,
-                  }}
+                <Pressable
+                  onPress={() =>
+                    productSellingHandlePressNavigation(product._id)
+                  }
                 >
-                  <Image
-                    source={{ uri: product.image }}
-                    style={{ width: 117, height: 117, borderRadius: 12 }}
-                  />
-                </View>
-                <View>
-                  <Text
+                  <View
                     style={{
-                      fontSize: 12,
-                      paddingBottom: 2,
-                      color: GlobalStyles.colors.text700,
+                      width: 117,
+                      height: 117,
+                      borderRadius: 12,
+                      marginBottom: 6,
                     }}
                   >
-                    {product.title}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: GlobalStyles.colors.text700,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Rp
-                    {currencyFormat(
-                      product.price - (product.price * product.discPer) / 100
-                    )}
-                  </Text>
-                </View>
-              </Pressable>
+                    <Image
+                      source={{ uri: product.image }}
+                      style={{ width: 117, height: 117, borderRadius: 12 }}
+                    />
+                  </View>
+                  <View>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        paddingBottom: 2,
+                        color: GlobalStyles.colors.text700,
+                      }}
+                    >
+                      {product.title}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: GlobalStyles.colors.text700,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Rp{" "}
+                      {currencyFormat(
+                        product.price - (product.price * product.discPer) / 100
+                      )}
+                    </Text>
+                  </View>
+                </Pressable>
+              </View>
             ))}
           </View>
         </View>

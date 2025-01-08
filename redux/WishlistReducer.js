@@ -1,88 +1,63 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axiosInstance from "../utils/axiosInstance";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createSlice } from "@reduxjs/toolkit";
 
-export const fetchWishlist = createAsyncThunk(
-  "wishlist/fetchWishlist",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.get("/wishlist");
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
+const WISHLIST_KEY = "wishlist";
 
-export const addToWishlist = createAsyncThunk(
-  "wishlist/addToWishlist",
-  async (productId, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.post("/wishlist", { productId });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
+const saveWishlistToStorage = async (wishlist) => {
+  try {
+    await AsyncStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
+  } catch (error) {
+    console.error("Failed to save wishlist to AsyncStorage");
   }
-);
+};
 
-export const removeFromWishlist = createAsyncThunk(
-  "wishlist/removeFromWishlist",
-  async (productId, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.delete("/wishlist", {
-        data: { productId },
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
+const loadWishlistFromStorage = async () => {
+  try {
+    const storedWishlist = await AsyncStorage.getItem(WISHLIST_KEY);
+    return storedWishlist ? JSON.parse(storedWishlist) : [];
+  } catch (error) {
+    console.error("Failed to load wishlist from AsyncStorage");
+    return [];
   }
-);
+};
 
 const wishlistSlice = createSlice({
   name: "wishlist",
   initialState: {
-    items: [],
-    status: "idle",
-    error: null,
+    wishlist: [],
   },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchWishlist.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchWishlist.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.items = action.payload;
-      })
-      .addCase(fetchWishlist.rejected, (state) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      })
-      .addCase(addToWishlist.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(addToWishlist.fulfilled, (state, action) => {
-        state.items = action.payload.products;
-      })
-      .addCase(addToWishlist.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      })
-      .addCase(removeFromWishlist.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(removeFromWishlist.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.items = action.payload.products;
-      })
-      .addCase(removeFromWishlist.rejected, (state, action) => {
-        state.status = "failed";
-        state.error =
-          action.payload || "Failed to remove product from wishlist.";
-      });
+  reducers: {
+    addToWishlist: (state, action) => {
+      const itemExists = state.wishlist.find(
+        (item) => item._id === action.payload._id
+      );
+      if (!itemExists) {
+        state.wishlist.push(action.payload);
+        saveWishlistToStorage(state.wishlist);
+      }
+    },
+    removeFromWishlist: (state, action) => {
+      state.wishlist = state.wishlist.filter(
+        (item) => item._id !== action.payload._id
+      );
+      saveWishlistToStorage(state.wishlist);
+    },
+    setWishlist: (state, action) => {
+      state.wishlist = action.payload;
+    },
+    clearWishlist: (state) => {
+      state.wishlist = [];
+      saveWishlistToStorage(state.wishlist); // Mengosongkan wishlist di AsyncStorage
+    },
   },
 });
+
+export const { addToWishlist, removeFromWishlist, setWishlist, clearWishlist } =
+  wishlistSlice.actions;
+
+export const initializeWishlist = () => async (dispatch) => {
+  const loadedWishlist = await loadWishlistFromStorage();
+  dispatch(setWishlist(loadedWishlist));
+};
 
 export default wishlistSlice.reducer;

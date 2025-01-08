@@ -20,7 +20,7 @@ const HeadFarmDetail = ({ details }) => {
       >
         <View style={{ width: 54, height: 54, paddingRight: 60 }}>
           <Image
-            source={{ uri: details.image }}
+            source={{ uri: details?.image }}
             style={{
               width: 54,
               height: 54,
@@ -35,11 +35,11 @@ const HeadFarmDetail = ({ details }) => {
               color: GlobalStyles.colors.text700,
             }}
           >
-            {details.name}
+            {details?.name}
           </Text>
           <View style={{ flexDirection: "row", gap: 4 }}>
             <Text style={{ color: GlobalStyles.colors.gray500, fontSize: 13 }}>
-              {details.rating}
+              {details?.rating}
             </Text>
             <FontAwesome
               name="star"
@@ -58,7 +58,7 @@ const HeadFarmDetail = ({ details }) => {
                 fontSize: 13,
               }}
             >
-              {details.followers} Followers
+              {details?.followers} Followers
             </Text>
           </View>
         </View>

@@ -12,7 +12,11 @@ const ProductCardFundItem = ({ productFund }) => {
     (productFund.fundingGoal / productFund.profitSharing) * 10;
 
   const productFundHandlePressNavigation = () => {
-    navigation.navigate("", { productId: productFund._id });
+    navigation.navigate("FarmDetailSelling", {
+      farmId: productFund.farmId._id,
+      initialTab: "Detail Funding",
+      productFundId: productFund._id,
+    });
   };
 
   return (
@@ -170,4 +174,184 @@ const ProductCardFundItem = ({ productFund }) => {
   );
 };
 
-export default ProductCardFundItem;
+const ProductCardFundLarge = ({ productFund }) => {
+  const navigation = useNavigation();
+
+  const fundingGoal = productFund.fundingGoal;
+  const profitSharing =
+    (productFund.fundingGoal / productFund.profitSharing) * 10;
+
+  const productFundHandlePressNavigation = () => {
+    navigation.navigate("FarmDetailSelling", {
+      farmId: productFund.farmId._id,
+      initialTab: "Detail Funding",
+      productFundId: productFund._id,
+    });
+  };
+
+  return (
+    <>
+      <Pressable
+        onPress={productFundHandlePressNavigation}
+        style={{
+          height: 244,
+          width: 390,
+          backgroundColor: GlobalStyles.colors.light,
+          borderRadius: 12,
+          shadowColor: GlobalStyles.colors.gray500,
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
+          borderColor: GlobalStyles.colors.store_line,
+          borderWidth: 0.25,
+        }}
+      >
+        <View>
+          <View
+            style={{
+              borderTopLeftRadius: 12,
+              borderTopRightRadius: 12,
+              marginBottom: 8,
+            }}
+          >
+            <Image
+              source={{ uri: productFund.images[0] }}
+              style={{
+                width: 390,
+                height: 126,
+                borderTopLeftRadius: 12,
+                borderTopRightRadius: 12,
+              }}
+            />
+          </View>
+          <View
+            style={{
+              padding: 2,
+              gap: 8,
+              marginHorizontal: 10,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 8,
+              }}
+            >
+              {/* Farm name and profile */}
+              <View
+                style={{
+                  width: 180,
+                  flexDirection: "row",
+
+                  gap: 6,
+                }}
+              >
+                <Image
+                  source={{ uri: productFund.farmId.image }}
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 24,
+                  }}
+                />
+
+                <View style={{ gap: 4 }}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: "bold",
+                      color: GlobalStyles.colors.text700,
+                    }}
+                  >
+                    {productFund.farmId.name}
+                  </Text>
+                  <Text
+                    style={{ fontSize: 12, color: GlobalStyles.colors.text100 }}
+                  >
+                    {productFund.farmId.location}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Rate farm */}
+              <View style={{ gap: 4, width: 180 }}>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: "bold",
+                    color: GlobalStyles.colors.gray500,
+                  }}
+                >
+                  Livestock trading capital
+                </Text>
+                <View style={{ flexDirection: "row", gap: 4 }}>
+                  <Octicons
+                    name="star-fill"
+                    size={12}
+                    color={GlobalStyles.colors.yellow}
+                  />
+                  <Text
+                    style={{ fontSize: 11, color: GlobalStyles.colors.text100 }}
+                  >
+                    {productFund.farmId.rating} Trust
+                  </Text>
+                  <Text
+                    style={{ fontSize: 11, color: GlobalStyles.colors.text700 }}
+                  >
+                    | {productFund.farmId.followers} Followers
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {/*  */}
+            <View
+              style={{
+                flexDirection: "row",
+                width: 288,
+                justifyContent: "space-between",
+                paddingTop: 8,
+              }}
+            >
+              <View style={{ gap: 4, width: 100 }}>
+                <Text
+                  style={{ fontSize: 12, color: GlobalStyles.colors.text700 }}
+                >
+                  Credit ceiling
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "bold",
+                    color: GlobalStyles.colors.primary,
+                  }}
+                >
+                  Rp{currencyFormat(fundingGoal)}
+                </Text>
+              </View>
+              <View style={{ gap: 4, width: 100 }}>
+                <Text
+                  style={{ fontSize: 12, color: GlobalStyles.colors.text700 }}
+                >
+                  Sharing Profit
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "bold",
+                    color: GlobalStyles.colors.primary,
+                  }}
+                >
+                  Rp
+                  {currencyFormat(profitSharing)}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Pressable>
+    </>
+  );
+};
+
+export { ProductCardFundItem, ProductCardFundLarge };

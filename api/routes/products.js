@@ -1,3 +1,5 @@
+//Perbaiki: Apakah product search berguna
+//Perbaiki sortir feature
 import express from "express";
 import Product from "../models/product.js";
 import Farm from "../models/farm.js";
@@ -71,7 +73,8 @@ router.get("/products/:id", authenticate, async (req, res) => {
   try {
     const product = await Product.findById(id)
       .populate("farmId")
-      .populate("shippingMethodId");
+      .populate("shippingMethodId")
+      .exec();
 
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
@@ -84,25 +87,25 @@ router.get("/products/:id", authenticate, async (req, res) => {
   }
 });
 
-//search product by query
-router.get("/product/earch", authenticate, async (req, res) => {
-  const { q } = req.query;
+// search product by query
+// router.get("/product/search", authenticate, async (req, res) => {
+//   const { q } = req.query;
 
-  try {
-    const regex = new RegExp(q, "i");
-    const products = await Product.find({ title: regex })
-      .populate("farmId")
-      .populate("shippingMethodId");
+//   try {
+//     const regex = new RegExp(q, "i");
+//     const products = await Product.find({ title: regex })
+//       .populate("farmId")
+//       .populate("shippingMethodId");
 
-    if (!products.length) {
-      return res.status(404).json({ error: "No products found" });
-    }
+//     if (!products.length) {
+//       return res.status(404).json({ error: "No products found" });
+//     }
 
-    res.status(200).json(products);
-  } catch (error) {
-    console.error("Error fetching products", error);
-    res.status(500).json({ error: "There is an error" });
-  }
-});
+//     res.status(200).json(products);
+//   } catch (error) {
+//     console.error("Error fetching products", error);
+//     res.status(500).json({ error: "There is an error" });
+//   }
+// });
 
 export default router;

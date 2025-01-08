@@ -3,9 +3,35 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { GlobalStyles } from "../../constants/style";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { createWallet, fetchWalletData } from "../../redux/WalletReducer";
+import { currencyFormat } from "../../utils/currencyFormat";
 
 const PaymentBar = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { wallet, loading, error } = useSelector((state) => state.wallet);
+
+  useEffect(() => {
+    dispatch(fetchWalletData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Jika wallet belum ada, buat wallet baru secara otomatis
+    if (!wallet && !loading && !error) {
+      dispatch(createWallet()); // Membuat wallet baru
+    }
+  }, [wallet, loading, error, dispatch]);
+
+  // const walletBalance = wallet ? currencyFormat(wallet.balance) : "0";
+
+  const walletBalance = wallet
+    ? wallet.balance >= 1_000_000
+      ? `${Math.floor(wallet.balance / 1_000_000)}Jt` // Hanya tampilkan angka bulat
+      : currencyFormat(wallet.balance) // Format biasa untuk <1 juta
+    : "0";
+
   return (
     <View
       style={{
@@ -38,12 +64,13 @@ const PaymentBar = () => {
             justifyContent: "space-between",
           }}
         >
-          <Text>Rp. 300.000</Text>
+          <Text>Rp{walletBalance}</Text>
           <Ionicons name="wallet-outline" size={18} color="brown" />
         </View>
       </Pressable>
 
-      <View
+      <Pressable
+        onPress={() => navigation.navigate("PointScreen")}
         style={{
           backgroundColor: GlobalStyles.colors.light,
           height: 58,
@@ -70,9 +97,10 @@ const PaymentBar = () => {
             color="orange"
           />
         </View>
-      </View>
+      </Pressable>
 
-      <View
+      <Pressable
+        onPress={() => navigation.navigate("TopUpScreen")}
         style={{
           backgroundColor: GlobalStyles.colors.light,
           height: 58,
@@ -99,7 +127,7 @@ const PaymentBar = () => {
             color="green"
           />
         </View>
-      </View>
+      </Pressable>
     </View>
   );
 };

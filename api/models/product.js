@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
-
-import ShippingMethod from "./shippingMethod.js";
 import Farm from "./farm.js";
+import ShippingMethod from "./shippingMethod.js";
 
 const Schema = mongoose.Schema;
 
@@ -37,6 +36,17 @@ const productSchema = new Schema(
   },
   { collection: "product" }
 );
+
+// Menambahkan virtual untuk produk yang terkait dengan product
+// productSchema.virtual("farmId", {
+//   ref: "Farm",
+//   localField: "_id",
+//   foreignField: "productId",
+// });
+
+// // Menggunakan .toObject atau .toJSON untuk memastikan virtuals ikut disertakan dalam response API
+// productSchema.set("toObject", { virtuals: true });
+// productSchema.set("toJSON", { virtuals: true });
 
 const Product = mongoose.model("Product", productSchema);
 

@@ -3,11 +3,14 @@ import React, { useEffect, useState } from "react";
 import { GlobalStyles } from "../../constants/style";
 import { fetchData } from "../../utils/fetchData";
 import HeaderBar from "../../components/HeaderBar/HeaderBar";
-import ProductCardFundItem from "../../components/Product/ProductFund/ProductCardFundItem";
+import { ProductCardFundItem } from "../../components/Product/ProductFund/ProductCardFundItem";
 import ProductCardSelling from "../../components/Product/ProductSelling/ProductCardSelling";
-import ProductSubcribe from "../../components/Product/ProductSubcribe/ProductSubcribe";
+import { ProductSubcribe } from "../../components/Product/ProductSubcribe/ProductSubcribe";
+import TitleForList from "../../components/Title/TitleForList";
+import { useNavigation } from "@react-navigation/native";
 
 const ResultProductSearchScreen = ({ route }) => {
+  const navigation = useNavigation();
   const { category } = route.params;
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,15 +93,14 @@ const ResultProductSearchScreen = ({ route }) => {
         {/* Render Course Items */}
         {groupedItems.course.length > 0 && (
           <View style={{ paddingBottom: 12 }}>
-            <Text
-              style={{
-                paddingBottom: 8,
-                fontWeight: 500,
-                color: GlobalStyles.colors.text700,
-              }}
-            >
-              Courses
-            </Text>
+            <TitleForList
+              text={"Courses"}
+              navigate={() =>
+                navigation.navigate("ListProductCourse", {
+                  data: groupedItems.course,
+                })
+              }
+            />
 
             <ScrollView
               horizontal
@@ -122,33 +124,28 @@ const ResultProductSearchScreen = ({ route }) => {
         {/* Render Fund Items */}
         {groupedItems.fund.length > 0 && (
           <View style={{ paddingBottom: 12 }}>
-            <Text
-              style={{
-                paddingBottom: 8,
-                fontWeight: 500,
-                color: GlobalStyles.colors.text700,
-              }}
-            >
-              Funds
-            </Text>
-            {groupedItems.fund.map((item, index) => (
-              <View key={`fund-${index}`}>{renderCard(item)}</View>
-            ))}
+            <TitleForList
+              text={"Funding"}
+              navigate={() =>
+                navigation.navigate("ListProductFund", {
+                  data: groupedItems.fund,
+                })
+              }
+            />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={{ gap: 10, flexDirection: "row" }}>
+                {groupedItems.fund.map((item, index) => (
+                  <View key={`fund-${index}`}>{renderCard(item)}</View>
+                ))}
+              </View>
+            </ScrollView>
           </View>
         )}
 
         {/* Render Product Items */}
         {groupedItems.product.length > 0 && (
           <View style={{ paddingBottom: 12 }}>
-            <Text
-              style={{
-                paddingBottom: 8,
-                fontWeight: 500,
-                color: GlobalStyles.colors.text700,
-              }}
-            >
-              Products
-            </Text>
+            <TitleForList text={"Products"} />
             <View
               style={{
                 flex: 1,

@@ -1,8 +1,13 @@
 import { Button, Image, Pressable, Text, View } from "react-native";
 import { GlobalStyles } from "../../constants/style";
 import { currencyFormat } from "../../utils/currencyFormat";
+import { dateFormat } from "../../utils/dateFormat";
 
 const TransactiionCardItem = ({ product }) => {
+  const buyAgainHandler = (item) => {
+    console.log("Buy again clicked for:", item);
+  };
+
   return (
     <View
       style={{
@@ -22,7 +27,7 @@ const TransactiionCardItem = ({ product }) => {
     >
       <View style={{ flexDirection: "column", flex: 1, gap: 8 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <View style={{ flexDirection: "row", gap: 8 }}>
+          <View style={{ flexDirection: "column", gap: 8 }}>
             <Text
               style={{
                 color: GlobalStyles.colors.text700,
@@ -30,7 +35,7 @@ const TransactiionCardItem = ({ product }) => {
                 fontWeight: "600",
               }}
             >
-              {product.feature}
+              {product.feature || "Product"}
             </Text>
             <Text
               style={{
@@ -39,7 +44,7 @@ const TransactiionCardItem = ({ product }) => {
                 fontWeight: "400",
               }}
             >
-              {product.date}
+              {dateFormat(product.orderDate) || "No Date"}
             </Text>
           </View>
           <View style={{ gap: 4 }}>
@@ -56,12 +61,13 @@ const TransactiionCardItem = ({ product }) => {
                 style={{
                   fontSize: 12,
                   color: GlobalStyles.colors.success500,
-                  fontWeight: 500,
+                  fontWeight: "500",
                 }}
               >
-                {product.status}
+                {product.status || "No Status"}
               </Text>
             </View>
+
             <Text
               style={{
                 color: GlobalStyles.colors.text700,
@@ -69,41 +75,49 @@ const TransactiionCardItem = ({ product }) => {
                 fontWeight: "bold",
               }}
             >
-              Rp{currencyFormat(product.price)}
+              Rp
+              {currencyFormat(product.totalAmount || 0)}
             </Text>
           </View>
         </View>
-        <View style={{ flexDirection: "row", gap: 12 }}>
-          <Image style={{ height: 32, width: 32, backgroundColor: "black" }} />
-          <View>
-            <View style={{ gap: 4 }}>
-              <Text
-                style={{
-                  color: GlobalStyles.colors.text700,
-                  fontSize: 14,
-                  fontWeight: "500",
+        {Array.isArray(product.products) &&
+          product.products.map((product, index) => (
+            <View key={index} style={{ flexDirection: "row", gap: 12 }}>
+              <Image
+                style={{ height: 32, width: 32, backgroundColor: "black" }}
+                source={{
+                  uri: product.productId?.image || "default_image_url",
                 }}
-              >
-                {product.title}
-              </Text>
+              />
               <View>
-                <Text
-                  style={{
-                    color: GlobalStyles.colors.text700,
-                    fontSize: 12,
-                    fontWeight: "400",
-                  }}
-                  s
-                >
-                  {product.quantity}
-                </Text>
+                <View style={{ gap: 4 }}>
+                  <Text
+                    style={{
+                      color: GlobalStyles.colors.text700,
+                      fontSize: 14,
+                      fontWeight: "500",
+                    }}
+                  >
+                    {product.productId?.title || "No Title"}
+                  </Text>
+                  <View>
+                    <Text
+                      style={{
+                        color: GlobalStyles.colors.text700,
+                        fontSize: 12,
+                        fontWeight: "400",
+                      }}
+                    >
+                      Quantity : {product.quantity || "0"}
+                    </Text>
+                  </View>
+                </View>
               </View>
             </View>
-          </View>
-        </View>
+          ))}
 
         <Pressable
-          onPress={() => buyAgainHandler(item)}
+          onPress={() => buyAgainHandler(product)}
           style={{
             backgroundColor: GlobalStyles.colors.primary100,
             padding: 8,
@@ -116,22 +130,13 @@ const TransactiionCardItem = ({ product }) => {
           <Text
             style={{
               color: GlobalStyles.colors.light,
-              fontWeight: 600,
+              fontWeight: "600",
               fontSize: 12,
             }}
           >
             Buy Again
           </Text>
         </Pressable>
-
-        {/* <Button
-          style={{ fontSize: 20, color: "green" }}
-          styleDisabled={{ color: "red" }}
-          onPress={() => this._handlePress()}
-          title="Buy again"
-        >
-          Buy again
-        </Button> */}
       </View>
     </View>
   );

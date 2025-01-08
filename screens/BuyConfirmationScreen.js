@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { GlobalStyles } from "../constants/style";
 import HeaderBar from "../components/HeaderBar/HeaderBar";
 import BottomTabButton from "../components/Button/BottomTabButton";
@@ -25,6 +25,7 @@ import { createOrder } from "../redux/OrderReducer";
 import axiosInstance from "../utils/axiosInstance";
 import { useNavigation } from "@react-navigation/native";
 import { currencyFormat } from "../utils/currencyFormat";
+import { fetchWalletData } from "../redux/WalletReducer";
 
 const protectionPrice = 50000;
 const serviceFee = 3000;
@@ -37,6 +38,13 @@ const BuyConfirmationScreen = () => {
   const total = useSelector((state) => state.cart.total);
   const discount = useSelector((state) => state.cart.discount);
   const status = useSelector((state) => state.cart.status);
+  const { wallet, loading, error } = useSelector((state) => state.wallet);
+
+  const [isCheckoutDisabled, setIsCheckoutDisabled] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchWalletData);
+  }, [dispatch]);
 
   useEffect(() => {
     if (status === "succeeded") {
@@ -75,9 +83,25 @@ const BuyConfirmationScreen = () => {
     handleFee +
     serviceFee;
 
+  useEffect(() => {
+    // Validasi apakah saldo cukup
+    if (wallet.balance < totalPayment) {
+      setIsCheckoutDisabled(true);
+    } else {
+      setIsCheckoutDisabled(false);
+    }
+  }, [wallet.balance, totalPayment]);
+
   const handleCheckout = async () => {
     if (cart.length === 0) {
       Alert.alert("Error", "Your cart is empty");
+      return;
+    }
+
+    if (!isCheckoutDisabled) {
+      Alert.alert("Succes", "Your Payment is Successfully");
+    } else {
+      Alert.alert("Error", "Your balance is not enough");
       return;
     }
 
@@ -340,16 +364,29 @@ const BuyConfirmationScreen = () => {
                 gap: 8,
               }}
             >
-              <Text
+              <View
                 style={{
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: GlobalStyles.colors.text700,
-                  paddingBottom: 4,
+                  justifyContent: "space-between",
+                  flexDirection: "row",
                 }}
               >
-                Payment Methode
-              </Text>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "600",
+                    color: GlobalStyles.colors.text700,
+                    paddingBottom: 4,
+                  }}
+                >
+                  Payment Methode
+                </Text>
+                <Pressable>
+                  <Text style={{ color: GlobalStyles.colors.primary }}>
+                    Select a payment method
+                  </Text>
+                </Pressable>
+              </View>
+
               <View style={{ flexDirection: "row", gap: 32 }}>
                 <View style={{ gap: 6 }}>
                   <Text style={{ color: GlobalStyles.colors.gray100 }}>
@@ -361,7 +398,7 @@ const BuyConfirmationScreen = () => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp. 300.000
+                    Rp. {currencyFormat(wallet.balance)}
                   </Text>
                 </View>
                 <View style={{ gap: 6 }}>
@@ -382,7 +419,7 @@ const BuyConfirmationScreen = () => {
                 <Text style={{ color: GlobalStyles.colors.error500 }}>
                   Your balance is not enough
                 </Text>
-                <Pressable>
+                <Pressable onPress={() => navigation.navigate("TopUpScreen")}>
                   <Text
                     style={{
                       color: GlobalStyles.colors.success500,
@@ -439,7 +476,7 @@ const BuyConfirmationScreen = () => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{total}
+                    Rp{currencyFormat(total)}
                   </Text>
                   <Text
                     style={{
@@ -463,7 +500,7 @@ const BuyConfirmationScreen = () => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{serviceFee}
+                    Rp{currencyFormat(serviceFee)}
                   </Text>
                   <Text
                     style={{
@@ -471,7 +508,7 @@ const BuyConfirmationScreen = () => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{handleFee}
+                    Rp{currencyFormat(handleFee)}
                   </Text>
                 </View>
               </View>
@@ -479,6 +516,7 @@ const BuyConfirmationScreen = () => {
                 style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
+                  paddingBottom: 32,
                 }}
               >
                 <Text
@@ -496,7 +534,7 @@ const BuyConfirmationScreen = () => {
                     fontSize: 16,
                   }}
                 >
-                  Rp{totalPayment}
+                  Rp{currencyFormat(totalPayment)}
                 </Text>
               </View>
             </View>
@@ -529,7 +567,7 @@ const BuyConfirmationScreen = () => {
                 color: GlobalStyles.colors.primary100,
               }}
             >
-              Rp{totalPayment}
+              Rp{currencyFormat(totalPayment)}
             </Text>
           </View>
         </Pressable>

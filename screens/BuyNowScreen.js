@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Cart from "../api/models/cartlist";
+
 import axiosInstance from "../utils/axiosInstance";
 import { BASE_URL } from "../api/config/apiConfig";
 import { currencyFormat } from "../utils/currencyFormat";
@@ -383,7 +383,7 @@ const BuyNowScreen = ({ route }) => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{product.shippingMethodId.cost}
+                    Rp{currencyFormat(product.shippingMethodId.cost)}
                   </Text>
                   <Text
                     style={{
@@ -399,7 +399,7 @@ const BuyNowScreen = ({ route }) => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{serviceFee}
+                    Rp{currencyFormat(serviceFee)}
                   </Text>
                   <Text
                     style={{
@@ -407,7 +407,7 @@ const BuyNowScreen = ({ route }) => {
                       fontWeight: "500",
                     }}
                   >
-                    Rp{handleFee}
+                    Rp{currencyFormat(handleFee)}
                   </Text>
                 </View>
               </View>
@@ -432,7 +432,7 @@ const BuyNowScreen = ({ route }) => {
                     fontSize: 16,
                   }}
                 >
-                  Rp{totalPayment}
+                  Rp{currencyFormat(totalPayment)}
                 </Text>
               </View>
             </View>
@@ -465,7 +465,7 @@ const BuyNowScreen = ({ route }) => {
                 color: GlobalStyles.colors.primary100,
               }}
             >
-              Rp{totalPayment}
+              Rp{currencyFormat(totalPayment)}
             </Text>
           </View>
         </Pressable>
